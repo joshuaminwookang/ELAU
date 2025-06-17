@@ -42,6 +42,28 @@ module AddCsv #(
 
 endmodule
 
+module FullAdder (
+	input  logic A,
+	input  logic B,
+	input  logic CI,  // operands
+	output logic S,
+	output logic CO  // sum and carry out
+);
+
+	logic [1:0] Auns, Buns, CIuns, Suns;  // unsigned temp
+
+	// type conversion: std_logic -> 2-bit unsigned
+	assign Auns  = {1'b0, A};
+	assign Buns  = {1'b0, B};
+	assign CIuns = {1'b0, CI};
+
+	// should force the compiler to use a full-adder cell
+	assign Suns = Auns + Buns + CIuns;
+
+	// type conversion: 2-bit unsigned -> std_logic
+	assign {CO, S} = Suns;
+
+endmodule
 
 // module behavioural_AddCsv #(
 // 	parameter int width = 8  // word width

@@ -80,7 +80,6 @@ module AddMopCsv #(
 
 endmodule
 
-
 module Cpr #(
 	parameter int              depth = 4,             // number of input bits
 	parameter int speed = 1  // performance parameter
@@ -148,5 +147,28 @@ module Cpr #(
 	// sum and carry out
 	assign S  = F[3*depth-6];
 	assign C  = COT[depth-3];
+
+endmodule
+
+module FullAdder (
+	input  logic A,
+	input  logic B,
+	input  logic CI,  // operands
+	output logic S,
+	output logic CO  // sum and carry out
+);
+
+	logic [1:0] Auns, Buns, CIuns, Suns;  // unsigned temp
+
+	// type conversion: std_logic -> 2-bit unsigned
+	assign Auns  = {1'b0, A};
+	assign Buns  = {1'b0, B};
+	assign CIuns = {1'b0, CI};
+
+	// should force the compiler to use a full-adder cell
+	assign Suns = Auns + Buns + CIuns;
+
+	// type conversion: 2-bit unsigned -> std_logic
+	assign {CO, S} = Suns;
 
 endmodule

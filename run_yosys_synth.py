@@ -16,9 +16,9 @@ import subprocess
 import os
 from pathlib import Path
 
+import pandas as pd
 # Common ABC logic optimization commands. Keys are descriptive names while the
 # values are the commands passed to ABC.
-# ... existing code ...
 
 ABC_OPTIMIZATIONS = [
     '&st', 
@@ -33,8 +33,11 @@ ABC_OPTIMIZATIONS = [
     '&dch -f', 
     '&syn3',
 ]
+TARGET_DESIGNS = [
+    "Add",
+    "Mul"
+]
 
-# ... rest of code ...
 
 
 def random_abc_sequence(avg_length=3):
@@ -90,18 +93,20 @@ def run_synth(src_file_path: str, num_runs, mean_abc_seq_len=5):
             stderr=subprocess.PIPE,
             text=True
         )
-        import pdb; pdb.set_trace()
         # print(f"Yosys command completed successfully: {result.stdout}")
     
         # Now you can access the stdout from the result
         stdout_output = result.stdout
         # Extract area using regex by finding "area =" followed by numbers
         area_match = re.search(r'area\s*=\s*(\d+\.\d+)', stdout_output)
-        parsed_area = float(area_match.group(1)) if area_match else None
+        parsed_area = float(area_match.group(1)) if area_match else -1
         
         # Extract delay using regex by finding "delay =" followed by numbers
         delay_match = re.search(r'delay\s*=\s*(\d+\.\d+)', stdout_output)
-        parsed_delay = float(delay_match.group(1)) if delay_match else None
+        parsed_delay = float(delay_match.group(1)) if delay_match else -1
+
+        if parsed_area == -1 or parsed_delay == -1:
+            import pdb; pdb.set_trace()
 
         print(f"Parsed area: {parsed_area}")
         print(f"Parsed delay: {parsed_delay}")
@@ -111,6 +116,7 @@ def run_synth(src_file_path: str, num_runs, mean_abc_seq_len=5):
         #     parsed_area = -1
         #     parsed_delay = -1
         results.append({
+            "design": top,
             "abc_cmd_full": abc_cmds_str,
             "abc_cmd": "; ".join(abc_cmd),
             "area": parsed_area,
@@ -131,11 +137,13 @@ def run_all(source, out_dir="./", num_runs_per_design=10, mean_abc_seq_len=5):
     
     assert Path(source).is_dir()
     sources = list(Path(source).glob("*.sv"))
+    sources = [s for s in sources if s.name.startswith("Add") or s.name.startswith("Mul")]
     if len(sources) == 0:
         raise FileNotFoundError("No source files found")
     if not Path(out_dir).is_dir():
         Path(out_dir).mkdir(exist_ok=True)
-    
+
+    full_results = []
     for source in sources:
         top = Path(source).stem
         print(f"Running synthesis for {top}...")
@@ -144,11 +152,21 @@ def run_all(source, out_dir="./", num_runs_per_design=10, mean_abc_seq_len=5):
             num_runs=num_runs_per_design,
             mean_abc_seq_len=mean_abc_seq_len,
         )
-
+        rtl_str = ""
+        with open(source, "r") as f:
+            rtl_str = f.read()
+        
+        for r in results:
+            r["rtl"] = rtl_str
         # save as .txt file for each entry in results
         for i, result in enumerate(results):
-            with open(f"{out_dir}/{top}_run{i}.txt", "w") as f:
+            with open(f"{out_dir}/episode_{top}_{i}.txt", "w") as f:
                 f.write(str(result))
+
+        full_results.extend(results)
+    
+    df = pd.DataFrame(full_results)
+    df.to_csv(os.path.join(out_dir, "synth_results.csv"))
 
 def main():
     p = argparse.ArgumentParser(

@@ -102,6 +102,64 @@ endmodule
 // 	assign P = (X * Y) + A;
 // endmodule
 
+module AddCsv #(
+	parameter int width = 8  // word width
+) (
+	input  logic [width-1:0] A1,  // operands
+	input  logic [width-1:0] A2,
+	input  logic [width-1:0] A3,
+	output logic [width-1:0] S,   // sum / carry vector
+	output logic [width-1:0] C
+);
+
+	logic [width-1:0] CT;  // unshifted output carries
+
+	// carry-save addition using full-adders
+	for (genvar i = 0; i < width; i++) begin : bits
+		FullAdder fa (
+		.A  (A1[i]),
+		.B  (A2[i]),
+		.CI (A3[i]),
+		.S  (S[i] ),
+		.CO (CT[i])
+		);
+	end
+
+	// rotate output carries by one position
+	assign C = {CT[width-2:0], 1'b0};
+
+endmodule
+
+module MulPPGenUns #(
+	parameter widthX = 8,  // word width of X
+	parameter widthY = 8
+)  // word width of Y
+(
+	input logic [widthX-1:0] X,  // multiplier
+	input logic [widthY-1:0] Y,  // multiplicand
+	output logic [widthX*(widthX+widthY)-1:0] PP
+);
+
+	// width of single part. prod.
+	localparam widthP = widthX + widthY;
+
+	logic [widthX*widthP-1:0] ppt;  // partial products
+
+	always_comb begin : ppGen
+		ppt = '0;  // partial products
+
+		// partial products x(i)y(k)
+		for (int i = 0; i < widthX; i++) begin
+			for (int k = 0; k < widthY; k++) begin
+				ppt[i*widthP+i+k] = X[i] & Y[k];
+			end
+		end
+
+		PP = ppt;
+	end
+
+endmodule
+
 module Cpr #(
 	parameter int              depth = 4,             // number of input bits
 	parameter int speed = 1  // performance parameter
@@ -214,64 +272,6 @@ module AddMopCsv #(
 
 	// shift left output carries by one position
 	assign C = {CT[width-2:0], 1'b0};
-
-endmodule
-
-module AddCsv #(
-	parameter int width = 8  // word width
-) (
-	input  logic [width-1:0] A1,  // operands
-	input  logic [width-1:0] A2,
-	input  logic [width-1:0] A3,
-	output logic [width-1:0] S,   // sum / carry vector
-	output logic [width-1:0] C
-);
-
-	logic [width-1:0] CT;  // unshifted output carries
-
-	// carry-save addition using full-adders
-	for (genvar i = 0; i < width; i++) begin : bits
-		FullAdder fa (
-		.A  (A1[i]),
-		.B  (A2[i]),
-		.CI (A3[i]),
-		.S  (S[i] ),
-		.CO (CT[i])
-		);
-	end
-
-	// rotate output carries by one position
-	assign C = {CT[width-2:0], 1'b0};
-
-endmodule
-
-module MulPPGenUns #(
-	parameter widthX = 8,  // word width of X
-	parameter widthY = 8
-)  // word width of Y
-(
-	input logic [widthX-1:0] X,  // multiplier
-	input logic [widthY-1:0] Y,  // multiplicand
-	output logic [widthX*(widthX+widthY)-1:0] PP
-);
-
-	// width of single part. prod.
-	localparam widthP = widthX + widthY;
-
-	logic [widthX*widthP-1:0] ppt;  // partial products
-
-	always_comb begin : ppGen
-		ppt = '0;  // partial products
-
-		// partial products x(i)y(k)
-		for (int i = 0; i < widthX; i++) begin
-			for (int k = 0; k < widthY; k++) begin
-				ppt[i*widthP+i+k] = X[i] & Y[k];
-			end
-		end
-
-		PP = ppt;
-	end
 
 endmodule
 

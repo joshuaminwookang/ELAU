@@ -122,6 +122,27 @@ endmodule
 // endmodule
 
 
+module RedXor #(
+	parameter int width = 8  // word width
+) (
+	input logic [width-1:0] A,  // input vector
+	output logic Z  // output bit
+);
+
+	logic zv;
+
+	// XOR all bits
+	// behavioral description used (well handled by all synthesizers)
+	always_comb begin
+		zv = A[0];
+		for (int i = 1; i < width; i++) begin
+			zv ^= A[i];
+		end
+		Z = zv;
+	end
+
+endmodule
+
 module PrefixAnd #(
 	parameter int width = 8,  // word width
 	parameter int speed = 0  // performance parameter
@@ -212,26 +233,5 @@ module PrefixAnd #(
 		end
 		assign PO = PT;
 	end // slowPrefix  
-
-endmodule
-
-module RedXor #(
-	parameter int width = 8  // word width
-) (
-	input logic [width-1:0] A,  // input vector
-	output logic Z  // output bit
-);
-
-	logic zv;
-
-	// XOR all bits
-	// behavioral description used (well handled by all synthesizers)
-	always_comb begin
-		zv = A[0];
-		for (int i = 1; i < width; i++) begin
-			zv ^= A[i];
-		end
-		Z = zv;
-	end
 
 endmodule
