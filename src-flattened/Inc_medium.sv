@@ -58,15 +58,15 @@ endmodule
 
 
 
-module behavioural_Inc #(
-	parameter int width = 8,     // word width
-	parameter int speed = 1  // performance parameter
-) (
-	input  logic [width-1:0] A,  // operand
-	output logic [width-1:0] Z   // result
-);
-	assign Z = A + 1;
-endmodule
+// module behavioural_Inc #(
+// 	parameter int width = 8,     // word width
+// 	parameter int speed = 1  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,  // operand
+// 	output logic [width-1:0] Z   // result
+// );
+// 	assign Z = A + 1;
+// endmodule
 
 module PrefixAnd #(
 	parameter int width = 8,  // word width

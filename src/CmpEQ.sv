@@ -37,12 +37,12 @@ endmodule
 
 
 
-module behavioural_CmpEQ #(
-	parameter int width = 8  // word width
-) (
-	input  logic [width-1:0] A,  // operands
-	input  logic [width-1:0] B,
-	output logic             EQ  // equal flag
-);
-	assign EQ = (A == B);
-endmodule
+// module behavioural_CmpEQ #(
+// 	parameter int width = 8  // word width
+// ) (
+// 	input  logic [width-1:0] A,  // operands
+// 	input  logic [width-1:0] B,
+// 	output logic             EQ  // equal flag
+// );
+// 	assign EQ = (A == B);
+// endmodule

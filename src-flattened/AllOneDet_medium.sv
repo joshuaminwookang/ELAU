@@ -48,14 +48,14 @@ endmodule
 
 
 
-module behavioural_AllOneDet #(
-	parameter int width = 8  // word width
-) (
-	input  logic [width-1:0] A,  // operand
-	output logic             Z   // all-ones flag
-);
-	assign Z = (A == {width{1'b1}});
-endmodule
+// module behavioural_AllOneDet #(
+// 	parameter int width = 8  // word width
+// ) (
+// 	input  logic [width-1:0] A,  // operand
+// 	output logic             Z   // all-ones flag
+// );
+// 	assign Z = (A == {width{1'b1}});
+// endmodule
 
 module RedAnd #(
 	parameter int width = 8  // word width

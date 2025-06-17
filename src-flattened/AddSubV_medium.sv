@@ -87,28 +87,28 @@ endmodule
 
 
 
-module behavioural_AddSubV #(
-	parameter int width = 8,  // word width
-	parameter int speed = 1  // performance parameter
-) (
-	input  logic [width-1:0] A,    // operands
-	input  logic [width-1:0] B,
-	input  logic             CI,   // carry in (added/subtracted)
-	input  logic             SUB,  // subtraction enable
-	output logic [width-1:0] S,    // sum
-	output logic             V     // overflow flag
-);
-	localparam MAX = 2**(width-1) -1;
-	localparam MIN = - 2**(width-1);
-	logic signed [width+1:0] Sext, Aext, Bext, CIext;
-	assign Aext = signed'(A);
-	assign Bext = signed'(B);
-	assign CIext = {{width-1{1'b0}},CI};
+// module behavioural_AddSubV #(
+// 	parameter int width = 8,  // word width
+// 	parameter int speed = 1  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,    // operands
+// 	input  logic [width-1:0] B,
+// 	input  logic             CI,   // carry in (added/subtracted)
+// 	input  logic             SUB,  // subtraction enable
+// 	output logic [width-1:0] S,    // sum
+// 	output logic             V     // overflow flag
+// );
+// 	localparam MAX = 2**(width-1) -1;
+// 	localparam MIN = - 2**(width-1);
+// 	logic signed [width+1:0] Sext, Aext, Bext, CIext;
+// 	assign Aext = signed'(A);
+// 	assign Bext = signed'(B);
+// 	assign CIext = {{width-1{1'b0}},CI};
 
-	assign Sext = SUB ? (Aext - Bext -CIext) : (Aext + Bext +CIext);
-	assign S = Sext[width-1:0];
-	assign V = (Sext>MAX) | (Sext<MIN);
-endmodule
+// 	assign Sext = SUB ? (Aext - Bext -CIext) : (Aext + Bext +CIext);
+// 	assign S = Sext[width-1:0];
+// 	assign V = (Sext>MAX) | (Sext<MIN);
+// endmodule
 
 module PrefixAndOr #(
 	parameter int              width = 8,             // word width

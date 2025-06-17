@@ -74,16 +74,16 @@ endmodule
 
 
 
-module behavioural_MulAddSgn #(
-	parameter int              widthX = 8,             // word width of XS, XC (<= widthY)
-	parameter int              widthY = 8,             // word width of Y
-	parameter int              widthA = 20,            // word width of A (>= widthX+widthY)
-	parameter lau_pkg::speed_e speed  = lau_pkg::FAST  // performance parameter
-) (
-	input  logic [widthX-1:0] X,  // multiplier
-	input  logic [widthY-1:0] Y,  // multiplicand
-	input  logic [widthA-1:0] A,  // augend
-	output logic [widthA-1:0] P   // product
-);
-	assign P = (signed'(X) * signed'(Y)) + signed'(A);
-endmodule
+// module behavioural_MulAddSgn #(
+// 	parameter int              widthX = 8,             // word width of XS, XC (<= widthY)
+// 	parameter int              widthY = 8,             // word width of Y
+// 	parameter int              widthA = 20,            // word width of A (>= widthX+widthY)
+// 	parameter lau_pkg::speed_e speed  = lau_pkg::FAST  // performance parameter
+// ) (
+// 	input  logic [widthX-1:0] X,  // multiplier
+// 	input  logic [widthY-1:0] Y,  // multiplicand
+// 	input  logic [widthA-1:0] A,  // augend
+// 	output logic [widthA-1:0] P   // product
+// );
+// 	assign P = (signed'(X) * signed'(Y)) + signed'(A);
+// endmodule

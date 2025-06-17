@@ -91,193 +91,19 @@ endmodule
 
 
 
-module behavioural_MulAddSgn #(
-	parameter int              widthX = 8,             // word width of XS, XC (<= widthY)
-	parameter int              widthY = 8,             // word width of Y
-	parameter int              widthA = 20,            // word width of A (>= widthX+widthY)
-	parameter int speed  = 2  // performance parameter
-) (
-	input  logic [widthX-1:0] X,  // multiplier
-	input  logic [widthY-1:0] Y,  // multiplicand
-	input  logic [widthA-1:0] A,  // augend
-	output logic [widthA-1:0] P   // product
-);
-	assign P = (signed'(X) * signed'(Y)) + signed'(A);
-endmodule
-
-module PrefixAndOr #(
-	parameter int              width = 8,             // word width
-	parameter int speed = 2  // performance parameter
-) (
-	input  logic [width-1:0] GI,  // gen./prop. in
-	input  logic [width-1:0] PI,  // gen./prop. in
-	output logic [width-1:0] GO,  // gen./prop. out
-	output logic [width-1:0] PO   // gen./prop. out
-);
-
-	// Constants
-	localparam int n = width;  // prefix structure width
-	localparam int m = $clog2(width);  // prefix structure depth
-
-	// Sklansky parallel-prefix carry-lookahead structure
-	if (speed == 2) begin : fastPrefix
-		logic [(m+1)*n-1:0] GT, PT;  // gen./prop. temp
-			assign GT[n-1:0] = GI;
-			assign PT[n-1:0] = PI;
-			for (genvar l = 1; l <= m; l++) begin : levels
-				for (genvar k = 0; k < 2 ** (m - l); k++) begin : groups
-					for (genvar i = 0; i < 2 ** (l - 1); i++) begin : bits
-						// pass prop and gen to following nodes
-						if ((k * 2 ** l + i) < n) begin : white
-							assign GT[l*n+k*2**l+i] = GT[(l-1)*n+k*2**l+i];
-							assign PT[l*n+k*2**l+i] = PT[(l-1)*n+k*2**l+i];
-						end
-						// calculate new propagate and generate
-						if ((k * 2 ** l + 2 ** (l - 1) + i) < n) begin : black
-							assign GT[l*n + k*2**l + 2**(l-1) + i] = 
-												GT[(l-1)*n + k*2**l + 2**(l-1) + i]
-											  | (  PT[(l-1)*n + k*2**l + 2**(l-1) + i]
-												 & GT[(l-1)*n + k*2**l + 2**(l-1) - 1] );
-							assign PT[l*n + k*2**l + 2**(l-1) + i] = 
-													PT[(l-1)*n + k*2**l + 2**(l-1) + i]
-												  & PT[(l-1)*n + k*2**l + 2**(l-1) - 1];
-						end
-					end
-				end
-			end
-			assign GO = GT[(m+1)*n-1 : m*n];
-			assign PO = PT[(m+1)*n-1 : m*n];
-	end
-
-	// Brent-Kung parallel-prefix carry-lookahead structure
-	if (speed == 1) begin : mediumPrefix
-		logic [(2*m)*n -1:0] GT, PT;  // gen./prop. temp
-		assign GT[n-1:0] = GI;
-		assign PT[n-1:0] = PI;
-
-		for (genvar l = 1; l <= m; l++) begin : levels1
-			for (genvar k = 0; k < 2**(m-l); k++) begin : groups
-				for (genvar i = 0; i < 2**l -1; i++) begin : bits
-					if ((k* 2**l +i) < n) begin : white
-						assign GT[l*n + k* 2**l +i] = GT[(l-1)*n + k* 2**l +i];
-						assign PT[l*n + k* 2**l +i] = PT[(l-1)*n + k* 2**l +i];
-					end // white
-				end // bits
-				if ((k* 2**l + 2**l -1) < n) begin : black
-					assign GT[l*n + k* 2**l + 2**l -1] =
-								GT[(l-1)*n + k* 2**l + 2**l - 1] |
-							  | (  PT[(l-1)*n + k* 2**l + 2**l     -1] 
-							     & GT[(l-1)*n + k* 2**l + 2**(l-1) -1]);
-					assign PT[l*n + k* 2**l + 2**l -1] =
-								PT[(l-1)*n + k*2**l + 2**l     -1] 
-							  & PT[(l-1)*n + k*2**l + 2**(l-1) -1];
-				end // black
-			end
-		end // level1
-		for (genvar l = m +1; l < 2*m; l++) begin : levels2
-			for (genvar i = 0; i < 2**(2*m -l); i++) begin : bits
-				if (i < n) begin : white
-					assign GT[l*n +i] = GT[(l-1)*n +i];
-					assign PT[l*n +i] = PT[(l-1)*n +i];
-				end // white
-			end // bits
-			for (genvar k = 1; k < 2**(l-m); k++) begin : groups
-				if (l < 2*m -1) begin : empty
-					for (genvar i = 0; i < 2**(2*m -l -1) -1; i++) begin : bits
-						if ((k* 2**(2*m -l) +i) < n) begin : white
-							assign GT[l*n + k* 2**(2*m -l) +i] = GT[(l-1)*n + k* 2**(2*m -l) +i];
-							assign PT[l*n + k* 2**(2*m -l) +i] = PT[(l-1)*n + k* 2**(2*m -l) +i];
-						end // white
-					end
-				end // empty
-				if ((k* 2**(2*m -l) + 2**(2*m -l -1) -1) < n) begin : black
-					assign GT[l*n + k* 2**(2*m -l) + 2**(2*m -l-1) -1] = 
-								GT[(l-1)*n + k* 2**(2*m-l) + 2**(2*m -l-1) -1]
-							  | (  PT[(l-1)*n + k* 2**(2*m-l) + 2**(2*m-l-1) -1] 
-								 & GT[(l-1)*n + k* 2**(2*m-l) -1] );
-					assign PT[l*n + k* 2**(2*m -l) + 2**(2*m -l-1) -1] = 
-								PT[(l-1)*n + k* 2**(2*m -l) + 2**(2*m -l-1) -1]
-							  & PT[(l-1)*n + k* 2**(2*m -l) -1];
-				end // black
-				for (genvar i = 2**(2*m -l-1); i < 2**(2*m -l); i++) begin : bits
-					if ((k* 2**(2*m -l) +i) < n) begin : white
-						assign GT[l*n + k* 2**(2*m -l) +i] = GT[(l-1)*n + k* 2**(2*m -l) +i];
-						assign PT[l*n + k* 2**(2*m -l) +i] = PT[(l-1)*n + k* 2**(2*m -l) +i];
-					end // white
-				end
-			end
-		end // level2
-		assign GO = GT[2*m*n -1 : (2*m -1) * n];
-		assign PO = PT[2*m*n -1 : (2*m -1) * n];
-	end  // Serial-prefix carry-lookahead structure
-	else if (speed == 0) begin : slowPrefix
-		logic [n-1:0] GT, PT;  // gen./prop. temp
-		assign GT[0] = GI[0];
-		assign PT[0] = PI[0];
-		
-		for (genvar i = 1; i < n; i++) begin : bits
-			assign GT[i] = GI[i] | (PI[i] & GT[i-1]);
-			assign PT[i] = PI[i] & PT[i-1];
-		end
-		assign GO = GT;
-		assign PO = PT;
-	end
-
-endmodule
-
-module Add #(
-	parameter int              width = 8,             // word width
-	parameter int speed = 2  // performance parameter
-) (
-	input  logic [width-1:0] A,  // operands
-	input  logic [width-1:0] B,
-	output logic [width-1:0] S   // sum
-);
-
-	// Function: Binary adder using parallel-prefix carry-lookahead logic.
-
-	logic [width-1:0] GI, PI;  // prefix gen./prop. in
-	logic [width-1:0] GO, PO;  // prefix gen./prop. out
-	logic [width-1:0] PT;  // adder propagate temp
-
-	// Internal signals for unsigned operands
-	logic [width-1:0] Auns, Buns, Suns;
-
-	// default ripple-carry adder as slow implementation
-	if (speed == 0) begin
-		// type conversion: std_logic_vector -> unsigned
-		assign Auns = A;
-		assign Buns = B;
-
-		// addition
-		assign Suns = Auns + Buns;
-
-		// type conversion: unsigned -> std_logic_vector
-		assign S = Suns;
-	end else begin
-		// parallel-prefix adders as medium and fast implementations
-
-		// calculate prefix input generate/propagate signals
-		assign GI = A & B;
-		assign PI = A | B;
-		// calculate adder propagate signals (PT = A xor B)
-		assign PT = ~GI & PI;
-
-		// calculate prefix output generate/propagate signals
-		PrefixAndOr #(
-			.width(width),
-			.speed(speed)
-		) prefix (
-			.GI(GI),
-			.PI(PI),
-			.GO(GO),
-			.PO(PO)
-		);
-
-		// calculate sum bits
-		assign S = PT ^ {GO[width-2:0], 1'b0};
-	end
-endmodule
+// module behavioural_MulAddSgn #(
+// 	parameter int              widthX = 8,             // word width of XS, XC (<= widthY)
+// 	parameter int              widthY = 8,             // word width of Y
+// 	parameter int              widthA = 20,            // word width of A (>= widthX+widthY)
+// 	parameter int speed  = 2  // performance parameter
+// ) (
+// 	input  logic [widthX-1:0] X,  // multiplier
+// 	input  logic [widthY-1:0] Y,  // multiplicand
+// 	input  logic [widthA-1:0] A,  // augend
+// 	output logic [widthA-1:0] P   // product
+// );
+// 	assign P = (signed'(X) * signed'(Y)) + signed'(A);
+// endmodule
 
 module Cpr #(
 	parameter int              depth = 4,             // number of input bits
@@ -463,4 +289,178 @@ module MulPPGenSgn #(
 		PP = ppt;
 	end
 
+endmodule
+
+module PrefixAndOr #(
+	parameter int              width = 8,             // word width
+	parameter int speed = 2  // performance parameter
+) (
+	input  logic [width-1:0] GI,  // gen./prop. in
+	input  logic [width-1:0] PI,  // gen./prop. in
+	output logic [width-1:0] GO,  // gen./prop. out
+	output logic [width-1:0] PO   // gen./prop. out
+);
+
+	// Constants
+	localparam int n = width;  // prefix structure width
+	localparam int m = $clog2(width);  // prefix structure depth
+
+	// Sklansky parallel-prefix carry-lookahead structure
+	if (speed == 2) begin : fastPrefix
+		logic [(m+1)*n-1:0] GT, PT;  // gen./prop. temp
+			assign GT[n-1:0] = GI;
+			assign PT[n-1:0] = PI;
+			for (genvar l = 1; l <= m; l++) begin : levels
+				for (genvar k = 0; k < 2 ** (m - l); k++) begin : groups
+					for (genvar i = 0; i < 2 ** (l - 1); i++) begin : bits
+						// pass prop and gen to following nodes
+						if ((k * 2 ** l + i) < n) begin : white
+							assign GT[l*n+k*2**l+i] = GT[(l-1)*n+k*2**l+i];
+							assign PT[l*n+k*2**l+i] = PT[(l-1)*n+k*2**l+i];
+						end
+						// calculate new propagate and generate
+						if ((k * 2 ** l + 2 ** (l - 1) + i) < n) begin : black
+							assign GT[l*n + k*2**l + 2**(l-1) + i] = 
+												GT[(l-1)*n + k*2**l + 2**(l-1) + i]
+											  | (  PT[(l-1)*n + k*2**l + 2**(l-1) + i]
+												 & GT[(l-1)*n + k*2**l + 2**(l-1) - 1] );
+							assign PT[l*n + k*2**l + 2**(l-1) + i] = 
+													PT[(l-1)*n + k*2**l + 2**(l-1) + i]
+												  & PT[(l-1)*n + k*2**l + 2**(l-1) - 1];
+						end
+					end
+				end
+			end
+			assign GO = GT[(m+1)*n-1 : m*n];
+			assign PO = PT[(m+1)*n-1 : m*n];
+	end
+
+	// Brent-Kung parallel-prefix carry-lookahead structure
+	if (speed == 1) begin : mediumPrefix
+		logic [(2*m)*n -1:0] GT, PT;  // gen./prop. temp
+		assign GT[n-1:0] = GI;
+		assign PT[n-1:0] = PI;
+
+		for (genvar l = 1; l <= m; l++) begin : levels1
+			for (genvar k = 0; k < 2**(m-l); k++) begin : groups
+				for (genvar i = 0; i < 2**l -1; i++) begin : bits
+					if ((k* 2**l +i) < n) begin : white
+						assign GT[l*n + k* 2**l +i] = GT[(l-1)*n + k* 2**l +i];
+						assign PT[l*n + k* 2**l +i] = PT[(l-1)*n + k* 2**l +i];
+					end // white
+				end // bits
+				if ((k* 2**l + 2**l -1) < n) begin : black
+					assign GT[l*n + k* 2**l + 2**l -1] =
+								GT[(l-1)*n + k* 2**l + 2**l - 1] |
+							  | (  PT[(l-1)*n + k* 2**l + 2**l     -1] 
+							     & GT[(l-1)*n + k* 2**l + 2**(l-1) -1]);
+					assign PT[l*n + k* 2**l + 2**l -1] =
+								PT[(l-1)*n + k*2**l + 2**l     -1] 
+							  & PT[(l-1)*n + k*2**l + 2**(l-1) -1];
+				end // black
+			end
+		end // level1
+		for (genvar l = m +1; l < 2*m; l++) begin : levels2
+			for (genvar i = 0; i < 2**(2*m -l); i++) begin : bits
+				if (i < n) begin : white
+					assign GT[l*n +i] = GT[(l-1)*n +i];
+					assign PT[l*n +i] = PT[(l-1)*n +i];
+				end // white
+			end // bits
+			for (genvar k = 1; k < 2**(l-m); k++) begin : groups
+				if (l < 2*m -1) begin : empty
+					for (genvar i = 0; i < 2**(2*m -l -1) -1; i++) begin : bits
+						if ((k* 2**(2*m -l) +i) < n) begin : white
+							assign GT[l*n + k* 2**(2*m -l) +i] = GT[(l-1)*n + k* 2**(2*m -l) +i];
+							assign PT[l*n + k* 2**(2*m -l) +i] = PT[(l-1)*n + k* 2**(2*m -l) +i];
+						end // white
+					end
+				end // empty
+				if ((k* 2**(2*m -l) + 2**(2*m -l -1) -1) < n) begin : black
+					assign GT[l*n + k* 2**(2*m -l) + 2**(2*m -l-1) -1] = 
+								GT[(l-1)*n + k* 2**(2*m-l) + 2**(2*m -l-1) -1]
+							  | (  PT[(l-1)*n + k* 2**(2*m-l) + 2**(2*m-l-1) -1] 
+								 & GT[(l-1)*n + k* 2**(2*m-l) -1] );
+					assign PT[l*n + k* 2**(2*m -l) + 2**(2*m -l-1) -1] = 
+								PT[(l-1)*n + k* 2**(2*m -l) + 2**(2*m -l-1) -1]
+							  & PT[(l-1)*n + k* 2**(2*m -l) -1];
+				end // black
+				for (genvar i = 2**(2*m -l-1); i < 2**(2*m -l); i++) begin : bits
+					if ((k* 2**(2*m -l) +i) < n) begin : white
+						assign GT[l*n + k* 2**(2*m -l) +i] = GT[(l-1)*n + k* 2**(2*m -l) +i];
+						assign PT[l*n + k* 2**(2*m -l) +i] = PT[(l-1)*n + k* 2**(2*m -l) +i];
+					end // white
+				end
+			end
+		end // level2
+		assign GO = GT[2*m*n -1 : (2*m -1) * n];
+		assign PO = PT[2*m*n -1 : (2*m -1) * n];
+	end  // Serial-prefix carry-lookahead structure
+	else if (speed == 0) begin : slowPrefix
+		logic [n-1:0] GT, PT;  // gen./prop. temp
+		assign GT[0] = GI[0];
+		assign PT[0] = PI[0];
+		
+		for (genvar i = 1; i < n; i++) begin : bits
+			assign GT[i] = GI[i] | (PI[i] & GT[i-1]);
+			assign PT[i] = PI[i] & PT[i-1];
+		end
+		assign GO = GT;
+		assign PO = PT;
+	end
+
+endmodule
+
+module Add #(
+	parameter int              width = 8,             // word width
+	parameter int speed = 2  // performance parameter
+) (
+	input  logic [width-1:0] A,  // operands
+	input  logic [width-1:0] B,
+	output logic [width-1:0] S   // sum
+);
+
+	// Function: Binary adder using parallel-prefix carry-lookahead logic.
+
+	logic [width-1:0] GI, PI;  // prefix gen./prop. in
+	logic [width-1:0] GO, PO;  // prefix gen./prop. out
+	logic [width-1:0] PT;  // adder propagate temp
+
+	// Internal signals for unsigned operands
+	logic [width-1:0] Auns, Buns, Suns;
+
+	// default ripple-carry adder as slow implementation
+	if (speed == 0) begin
+		// type conversion: std_logic_vector -> unsigned
+		assign Auns = A;
+		assign Buns = B;
+
+		// addition
+		assign Suns = Auns + Buns;
+
+		// type conversion: unsigned -> std_logic_vector
+		assign S = Suns;
+	end else begin
+		// parallel-prefix adders as medium and fast implementations
+
+		// calculate prefix input generate/propagate signals
+		assign GI = A & B;
+		assign PI = A | B;
+		// calculate adder propagate signals (PT = A xor B)
+		assign PT = ~GI & PI;
+
+		// calculate prefix output generate/propagate signals
+		PrefixAndOr #(
+			.width(width),
+			.speed(speed)
+		) prefix (
+			.GI(GI),
+			.PI(PI),
+			.GO(GO),
+			.PO(PO)
+		);
+
+		// calculate sum bits
+		assign S = PT ^ {GO[width-2:0], 1'b0};
+	end
 endmodule

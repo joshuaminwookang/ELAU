@@ -78,24 +78,24 @@ endmodule
 
 
 
-module behavioural_LeadZeroDet #(
-	parameter int width = 8,     // word width
-	parameter int speed = 0  // performance parameter
-) (
-	input  logic [width-1:0] A,  // operand
-	output logic [width-1:0] Z   // LZD output
-);
-	logic [width-1:0] idx;
-	always_comb begin
-		idx = width;
-		for (int i = 0; i < width ; i++ ) begin
-			if(A[i] == 1'b1) begin
-				idx = i;
-			end
-		end
-		Z = 1'b1 << idx;
-	end
-endmodule
+// module behavioural_LeadZeroDet #(
+// 	parameter int width = 8,     // word width
+// 	parameter int speed = 0  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,  // operand
+// 	output logic [width-1:0] Z   // LZD output
+// );
+// 	logic [width-1:0] idx;
+// 	always_comb begin
+// 		idx = width;
+// 		for (int i = 0; i < width ; i++ ) begin
+// 			if(A[i] == 1'b1) begin
+// 				idx = i;
+// 			end
+// 		end
+// 		Z = 1'b1 << idx;
+// 	end
+// endmodule
 
 module PrefixAnd #(
 	parameter int width = 8,  // word width

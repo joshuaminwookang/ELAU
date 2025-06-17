@@ -41,12 +41,12 @@ endmodule
 
 
 
-module behavioural_Inc #(
-	parameter int width = 8,     // word width
-	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
-) (
-	input  logic [width-1:0] A,  // operand
-	output logic [width-1:0] Z   // result
-);
-	assign Z = A + 1;
-endmodule
+// module behavioural_Inc #(
+// 	parameter int width = 8,     // word width
+// 	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,  // operand
+// 	output logic [width-1:0] Z   // result
+// );
+// 	assign Z = A + 1;
+// endmodule

@@ -10,9 +10,10 @@ import argparse
 import random
 import shlex
 import shutil
+import re
+import numpy as np
 import subprocess
 import os
-import re
 from pathlib import Path
 
 # Common ABC logic optimization commands. Keys are descriptive names while the
@@ -24,33 +25,30 @@ ABC_OPTIMIZATIONS = [
     '&synch2', 
     '&dc2', 
     '&syn2', 
-    '&sweep', 
-    '&scorr', 
+    # '&sweep', 
+    # '&scorr', 
     '&b',
     '&b -d', 
     '&dch', 
     '&dch -f', 
     '&syn3',
-    '&syn4', 
 ]
 
 # ... rest of code ...
 
 
-def random_abc_sequence(length=3):
+def random_abc_sequence(avg_length=3):
     """Return a random sequence of ABC optimization commands.
 
     Parameters
     ----------
     length: int
         Number of random commands to choose.
-    """
+    """    
+    k = np.random.geometric(1/avg_length)
+    return random.choices(ABC_OPTIMIZATIONS, k=k)
 
-    cmds = random.choices(ABC_OPTIMIZATIONS, k=length)
-    return cmds
-
-
-def run_synth(source, out_dir="./", flatten=False, abc_cmds: list[str]=[]):
+def run_synth(src_file_path: str, num_runs, mean_abc_seq_len=5):
     """Invoke Yosys to synthesize ``top`` from ``sources`` and write ``out_json``.
 
     If ``top`` is ``None``, use the basename of the first source file.
@@ -59,43 +57,42 @@ def run_synth(source, out_dir="./", flatten=False, abc_cmds: list[str]=[]):
     if shutil.which("yosys") is None:
         raise FileNotFoundError("yosys binary not found in PATH")
     
-    if Path(source).is_dir():
-        sources = list(Path(source).glob("*.sv"))
-    else:
-        sources = [source]
-    if len(sources) == 0:
-        raise FileNotFoundError("No source files found")
+    assert not Path(src_file_path).is_dir()
+    if not Path(src_file_path).is_file():
+        raise FileNotFoundError(f"Source file {src_file_path} not found")
 
+    results: list[dict] = []
+
+    top = Path(src_file_path).stem.split("_")[0]
     tmp_yosys_tcl = Path("./tmp_yosys_script.tcl")
-    for source in sources:
-        if not Path(source).is_file():
-            raise FileNotFoundError(f"Source file {source} not found")
-        top = Path(sources[0]).stem
-
+    for _ in range(num_runs):
+        abc_cmd = random_abc_sequence(avg_length=mean_abc_seq_len)
         cmd_script = [
-            "read_verilog -sv " + f"{str(source)}",
+            "read_verilog -sv " + f"{str(src_file_path)}",
             # f"synth -top {shlex.quote(top)}" + (" -flatten" if flatten else ""),
             f"synth -top {shlex.quote(top)} -run coarse",
             "opt -fast -full", "memory_map", "opt -full", "techmap", "opt -fast",
         ]
-        if abc_cmds:
-            abc_cmds_str = "strash; &get -n; &fraig -x; &put; scorr; dc2; dretime; strash; &get -n; "
-            abc_cmds_str += "; ".join(abc_cmds) + "; &nf -v; &put; print_stats"
-            with open(tmp_yosys_tcl, "w") as f:
-                f.write(abc_cmds_str)
-            cmd_script.append(f"abc -script {str(tmp_yosys_tcl)}")
-        else:
-            cmd_script.append(f"abc -fast")
-        out_verilog = Path(out_dir) / f"{top}.synth.v"
-        cmd_script.append(f"write_verilog {str(out_verilog)}")
+        abc_cmds_str = "strash; &get -n; &fraig -x; &put; scorr; dretime; strash; &get -n; "
+        # abc_cmds_str = "strash; &get -n; &fraig -x; "
+        abc_cmds_str += "; ".join(abc_cmd) + "; &put; map; print_stats"
+        with open(tmp_yosys_tcl, "w") as f:
+            f.write(abc_cmds_str)
+        cmd_script.append(f"abc -script {str(tmp_yosys_tcl)}")
 
+        stdout_output=""
+        # try:
+        print(f"abc_cmds_str:\n{abc_cmds_str}")
         result = subprocess.run(
             ["yosys", "-p", "; ".join(cmd_script)],
             check=True,
             stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
             text=True
         )
-        
+        import pdb; pdb.set_trace()
+        # print(f"Yosys command completed successfully: {result.stdout}")
+    
         # Now you can access the stdout from the result
         stdout_output = result.stdout
         # Extract area using regex by finding "area =" followed by numbers
@@ -105,7 +102,53 @@ def run_synth(source, out_dir="./", flatten=False, abc_cmds: list[str]=[]):
         # Extract delay using regex by finding "delay =" followed by numbers
         delay_match = re.search(r'delay\s*=\s*(\d+\.\d+)', stdout_output)
         parsed_delay = float(delay_match.group(1)) if delay_match else None
-        import pdb;  pdb.set_trace()
+
+        print(f"Parsed area: {parsed_area}")
+        print(f"Parsed delay: {parsed_delay}")
+            
+        # except:
+        #     print("Error during yosys run")
+        #     parsed_area = -1
+        #     parsed_delay = -1
+        results.append({
+            "abc_cmd_full": abc_cmds_str,
+            "abc_cmd": "; ".join(abc_cmd),
+            "area": parsed_area,
+            "delay": parsed_delay,
+            "cmd_script": cmd_script,
+            "stdout_output": stdout_output
+        })
+    return results
+
+def run_all(source, out_dir="./", num_runs_per_design=10, mean_abc_seq_len=5):
+    """Invoke Yosys to synthesize ``top`` from ``sources`` and write ``out_json``.
+
+    If ``top`` is ``None``, use the basename of the first source file.
+    """
+
+    if shutil.which("yosys") is None:
+        raise FileNotFoundError("yosys binary not found in PATH")
+    
+    assert Path(source).is_dir()
+    sources = list(Path(source).glob("*.sv"))
+    if len(sources) == 0:
+        raise FileNotFoundError("No source files found")
+    if not Path(out_dir).is_dir():
+        Path(out_dir).mkdir(exist_ok=True)
+    
+    for source in sources:
+        top = Path(source).stem
+        print(f"Running synthesis for {top}...")
+        results = run_synth(
+            src_file_path=source,
+            num_runs=num_runs_per_design,
+            mean_abc_seq_len=mean_abc_seq_len,
+        )
+
+        # save as .txt file for each entry in results
+        for i, result in enumerate(results):
+            with open(f"{out_dir}/{top}_run{i}.txt", "w") as f:
+                f.write(str(result))
 
 def main():
     p = argparse.ArgumentParser(
@@ -125,27 +168,25 @@ def main():
         help="Output file dir",
     )
     p.add_argument(
-        "--flatten",
-        action="store_true",
-        help="Flatten design before mapping",
-    )
-    p.add_argument(
-        "--abc-cmds",
-        help="ABC optimization command sequence to apply",
-    )
-    p.add_argument(
-        "--random-abc",
+        "--num-runs-per-design",
+        "-n",
+        help="Number of runs per design",
+        default=10,
         type=int,
-        default=3,
-        help="Apply N random ABC optimization steps from a built-in pool",
+    )
+    p.add_argument(
+        "--seed",
+        default=0,
+        type=int
     )
     args = p.parse_args()
-    os.makedirs(args.out, exist_ok=True)
-    abc_cmds = args.abc_cmds
-    if abc_cmds is None and args.random_abc:
-        abc_cmds = random_abc_sequence(args.random_abc)
 
-    run_synth(args.source, args.out, args.flatten, abc_cmds)
+
+    random.seed(args.seed)
+    np.random.seed(args.seed)
+    
+    os.makedirs(args.out, exist_ok=True)
+    run_all(args.source, args.out, args.num_runs_per_design)
 
 
 if __name__ == '__main__':

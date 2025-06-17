@@ -63,17 +63,17 @@ module IncC #(
 endmodule
 
 
-module behavioural_IncC #(
-	parameter int width = 8,     // word width
-	parameter int speed = 0  // performance parameter
-) (
-	input  logic [width-1:0] A,   // operand
-	input  logic             CI,  // carry in
-	output logic [width-1:0] Z,   // result
-	output logic             CO   // carry out
-);
-	assign {CO,Z} = A + CI;
-endmodule
+// module behavioural_IncC #(
+// 	parameter int width = 8,     // word width
+// 	parameter int speed = 0  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,   // operand
+// 	input  logic             CI,  // carry in
+// 	output logic [width-1:0] Z,   // result
+// 	output logic             CO   // carry out
+// );
+// 	assign {CO,Z} = A + CI;
+// endmodule
 
 module PrefixAnd #(
 	parameter int width = 8,  // word width

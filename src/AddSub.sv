@@ -63,14 +63,14 @@ endmodule
 
 
 
-module behavioural_AddSub #(
-	parameter int width = 8,  // word width
-	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
-) (
-	input  logic [width-1:0] A,    // operands
-	input  logic [width-1:0] B,
-	input  logic             SUB,  // subtraction enable
-	output logic [width-1:0] S     // sum
-);
-	assign S = SUB ? (A-B) : (A+B);
-endmodule
+// module behavioural_AddSub #(
+// 	parameter int width = 8,  // word width
+// 	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,    // operands
+// 	input  logic [width-1:0] B,
+// 	input  logic             SUB,  // subtraction enable
+// 	output logic [width-1:0] S     // sum
+// );
+// 	assign S = SUB ? (A-B) : (A+B);
+// endmodule

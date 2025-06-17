@@ -43,13 +43,13 @@ endmodule
 
 
 
-module behavioural_IncDec #(
-	parameter int width = 8,     // word width
-	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
-) (
-	input  logic [width-1:0] A,    // operand
-	input  logic             DEC,  // decrement enable
-	output logic [width-1:0] Z     // result
-);
-	assign Z = DEC? A-1: A+1;
-endmodule
+// module behavioural_IncDec #(
+// 	parameter int width = 8,     // word width
+// 	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,    // operand
+// 	input  logic             DEC,  // decrement enable
+// 	output logic [width-1:0] Z     // result
+// );
+// 	assign Z = DEC? A-1: A+1;
+// endmodule

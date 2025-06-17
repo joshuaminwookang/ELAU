@@ -54,11 +54,11 @@ endmodule
 
 
 
-module behavioural_Decode #(
-	parameter int width = 8  // word width
-) (
-	input  logic [($clog2(width)-1):0] A,  // encoded input
-	output logic [          width-1:0] Z   // output vector
-);
-	assign Z = 1 << A;
-endmodule
+// module behavioural_Decode #(
+// 	parameter int width = 8  // word width
+// ) (
+// 	input  logic [($clog2(width)-1):0] A,  // encoded input
+// 	output logic [          width-1:0] Z   // output vector
+// );
+// 	assign Z = 1 << A;
+// endmodule

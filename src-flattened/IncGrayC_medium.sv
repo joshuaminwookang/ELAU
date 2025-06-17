@@ -102,50 +102,29 @@ endmodule
 
 
 
-module behavioural_IncGrayC #(
-	parameter int width = 16,  // word width
-	parameter int speed = 1  // performance parameter
-) (
-	input  logic [width-1:0] A,   // operand
-	input  logic             CI,  // carry in
-	output logic [width-1:0] Z    // result
-);
-	logic [width-1:0] Abin, Zbin;
-	behavioural_Gray2Bin #(width, speed) i_gray2bin (
-		.G(A),
-		.B(Abin)
-	);
+// module behavioural_IncGrayC #(
+// 	parameter int width = 16,  // word width
+// 	parameter int speed = 1  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,   // operand
+// 	input  logic             CI,  // carry in
+// 	output logic [width-1:0] Z    // result
+// );
+// 	logic [width-1:0] Abin, Zbin;
+// 	behavioural_Gray2Bin #(width, speed) i_gray2bin (
+// 		.G(A),
+// 		.B(Abin)
+// 	);
 	
-	assign Zbin = Abin + CI;
+// 	assign Zbin = Abin + CI;
 
-	behavioural_Bin2Gray #(width) i_bin2gray (
-		.B(Zbin),
-		.G(Z)
-	);
+// 	behavioural_Bin2Gray #(width) i_bin2gray (
+// 		.B(Zbin),
+// 		.G(Z)
+// 	);
 
-endmodule
+// endmodule
 
-
-module RedXor #(
-	parameter int width = 8  // word width
-) (
-	input logic [width-1:0] A,  // input vector
-	output logic Z  // output bit
-);
-
-	logic zv;
-
-	// XOR all bits
-	// behavioral description used (well handled by all synthesizers)
-	always_comb begin
-		zv = A[0];
-		for (int i = 1; i < width; i++) begin
-			zv ^= A[i];
-		end
-		Z = zv;
-	end
-
-endmodule
 
 module PrefixAnd #(
 	parameter int width = 8,  // word width
@@ -240,26 +219,23 @@ module PrefixAnd #(
 
 endmodule
 
-module behavioural_Bin2Gray #(
+module RedXor #(
 	parameter int width = 8  // word width
 ) (
-	input  logic [width-1:0] B,  // binary input
-	output logic [width-1:0] G   // Gray output
+	input logic [width-1:0] A,  // input vector
+	output logic Z  // output bit
 );
 
-	assign G = B ^ (B >> 1);
+	logic zv;
 
-endmodule
-
-module behavioural_Gray2Bin #(
-	parameter int width = 8,  // word width
-	parameter int speed = 1  // performance parameter
-) (
-	input  logic [width-1:0] G,  // Gray input
-	output logic [width-1:0] B   // binary output
-);
-
-    for (genvar i = 0; i < width; i++)
-        assign B[i] = ^G[width-1:i];
+	// XOR all bits
+	// behavioral description used (well handled by all synthesizers)
+	always_comb begin
+		zv = A[0];
+		for (int i = 1; i < width; i++) begin
+			zv ^= A[i];
+		end
+		Z = zv;
+	end
 
 endmodule

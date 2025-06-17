@@ -41,12 +41,12 @@ module FullAdder (
 endmodule
 
 
-module behavioural_FullAdder (
-	input  logic A,
-	input  logic B,
-	input  logic CI,  // operands
-	output logic S,
-	output logic CO  // sum and carry out
-);
-	assign {CO, S} = A + B + CI;
-endmodule
+// module behavioural_FullAdder (
+// 	input  logic A,
+// 	input  logic B,
+// 	input  logic CI,  // operands
+// 	output logic S,
+// 	output logic CO  // sum and carry out
+// );
+// 	assign {CO, S} = A + B + CI;
+// endmodule

@@ -59,21 +59,21 @@ endmodule
 
 
 
-module behavioural_LeadOneDet #(
-	parameter int width = 8,     // word width
-	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
-) (
-	input  logic [width-1:0] A,  // operand
-	output logic [width-1:0] Z   // LOD output
-);
-	logic [width-1:0] idx;
-	always_comb begin
-		idx = width;
-		for (int i = 0; i < width ; i++ ) begin
-			if(A[i] == 1'b0) begin
-				idx = i;
-			end
-		end
-		Z = 1'b1 << idx;
-	end
-endmodule
+// module behavioural_LeadOneDet #(
+// 	parameter int width = 8,     // word width
+// 	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,  // operand
+// 	output logic [width-1:0] Z   // LOD output
+// );
+// 	logic [width-1:0] idx;
+// 	always_comb begin
+// 		idx = width;
+// 		for (int i = 0; i < width ; i++ ) begin
+// 			if(A[i] == 1'b0) begin
+// 				idx = i;
+// 			end
+// 		end
+// 		Z = 1'b1 << idx;
+// 	end
+// endmodule

@@ -58,17 +58,17 @@ endmodule
 
 
 
-module behavioural_Cnt #(
-	parameter int              depth = 18,            // number of input bits
-	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
-) (
-	input logic [depth-1:0] A,  // input bits
-	output logic [lau_pkg::log2floor(depth):0] S  // sum output
-);
-	always_comb begin
-		S = '0;
-		for(int i = 0; i < depth; i++) begin
-			S += A[i];
-		end
-	end
-endmodule
+// module behavioural_Cnt #(
+// 	parameter int              depth = 18,            // number of input bits
+// 	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
+// ) (
+// 	input logic [depth-1:0] A,  // input bits
+// 	output logic [lau_pkg::log2floor(depth):0] S  // sum output
+// );
+// 	always_comb begin
+// 		S = '0;
+// 		for(int i = 0; i < depth; i++) begin
+// 			S += A[i];
+// 		end
+// 	end
+// endmodule

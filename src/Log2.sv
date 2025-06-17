@@ -42,19 +42,19 @@ endmodule
 
 
 
-module behavioural_Log2 #(
-    parameter int width = 8,     // word width
-    parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
-) (
-    input logic [width-1:0] A,  // operand
-    output logic [$clog2(width)-1:0] Z  // result
-);
-    always_comb begin
-		Z = '0;
-		for (int i = 0; i < width ; i++ ) begin
-			if(A[i] == 1'b1) begin
-				Z = i;
-			end
-		end
-	end
-endmodule
+// module behavioural_Log2 #(
+//     parameter int width = 8,     // word width
+//     parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
+// ) (
+//     input logic [width-1:0] A,  // operand
+//     output logic [$clog2(width)-1:0] Z  // result
+// );
+//     always_comb begin
+// 		Z = '0;
+// 		for (int i = 0; i < width ; i++ ) begin
+// 			if(A[i] == 1'b1) begin
+// 				Z = i;
+// 			end
+// 		end
+// 	end
+// endmodule

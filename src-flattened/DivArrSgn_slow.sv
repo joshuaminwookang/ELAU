@@ -101,18 +101,18 @@ endmodule
 
 
 
-module behavioural_DivArrSgn #(
-	parameter int widthX = 16,  // word width of X
-	parameter int widthY = 8    // word width of Y
-) (
-	input  logic [     widthX-1:0] X,  // dividend
-	input  logic [     widthY-1:0] Y,  // divisor, normalized
-	output logic [widthX-widthY:0] Q,  // quotient
-	output logic [     widthY-1:0] R   // remainder
-);
-	assign Q = signed'(X) / signed'(Y);
-	assign R = signed'(X) % signed'(Y);
-endmodule
+// module behavioural_DivArrSgn #(
+// 	parameter int widthX = 16,  // word width of X
+// 	parameter int widthY = 8    // word width of Y
+// ) (
+// 	input  logic [     widthX-1:0] X,  // dividend
+// 	input  logic [     widthY-1:0] Y,  // divisor, normalized
+// 	output logic [widthX-widthY:0] Q,  // quotient
+// 	output logic [     widthY-1:0] R   // remainder
+// );
+// 	assign Q = signed'(X) / signed'(Y);
+// 	assign R = signed'(X) % signed'(Y);
+// endmodule
 
 module FullAdder (
 	input  logic A,

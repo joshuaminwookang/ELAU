@@ -75,20 +75,20 @@ endmodule
 
 
 
-module behavioural_Cnt #(
-	parameter int              depth = 18,            // number of input bits
-	parameter int speed = 1  // performance parameter
-) (
-	input logic [depth-1:0] A,  // input bits
-	output logic [log2floor(depth):0] S  // sum output
-);
-	always_comb begin
-		S = '0;
-		for(int i = 0; i < depth; i++) begin
-			S += A[i];
-		end
-	end
-endmodule
+// module behavioural_Cnt #(
+// 	parameter int              depth = 18,            // number of input bits
+// 	parameter int speed = 1  // performance parameter
+// ) (
+// 	input logic [depth-1:0] A,  // input bits
+// 	output logic [log2floor(depth):0] S  // sum output
+// );
+// 	always_comb begin
+// 		S = '0;
+// 		for(int i = 0; i < depth; i++) begin
+// 			S += A[i];
+// 		end
+// 	end
+// endmodule
 
 module CntSlice #(
 	parameter int              depth = 4,             // number of input bits

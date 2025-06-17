@@ -99,32 +99,32 @@ endmodule
 
 
 
-// X is widthX-bits wide and we have to make sure 
-// the result is representable in widthY-bits
-module behavioural_DivArrUns #(
-	parameter int widthX = 16,  // word width of X
-	parameter int widthY = 8    // word width of Y
-) (
-	input  logic [     widthX-1:0] X,  // dividend
-	input  logic [     widthY-1:0] Y,  // divisor, normalized
-	output logic [widthX-widthY:0] Q,  // quotient
-	output logic [     widthY-1:0] R   // remainder
-);
-	localparam QMAX = 2**(widthY-1) -1;
-	logic [widthX:0] Qtmp;
-	always_comb begin
-		Qtmp = X / Y;
-		// Q < 2^n -> X<2^n *Y, where n is width of Y
-		// -> Y in [2^(n-1), 2^n -1], ie Y must be normalized
-		if(Qtmp > QMAX) begin
-			R = 'x;
-			Q = 'x;
-		end else begin
-			R = X % Y;
-			Q = X / Y;
-		end
-	end
-endmodule
+// // X is widthX-bits wide and we have to make sure 
+// // the result is representable in widthY-bits
+// module behavioural_DivArrUns #(
+// 	parameter int widthX = 16,  // word width of X
+// 	parameter int widthY = 8    // word width of Y
+// ) (
+// 	input  logic [     widthX-1:0] X,  // dividend
+// 	input  logic [     widthY-1:0] Y,  // divisor, normalized
+// 	output logic [widthX-widthY:0] Q,  // quotient
+// 	output logic [     widthY-1:0] R   // remainder
+// );
+// 	localparam QMAX = 2**(widthY-1) -1;
+// 	logic [widthX:0] Qtmp;
+// 	always_comb begin
+// 		Qtmp = X / Y;
+// 		// Q < 2^n -> X<2^n *Y, where n is width of Y
+// 		// -> Y in [2^(n-1), 2^n -1], ie Y must be normalized
+// 		if(Qtmp > QMAX) begin
+// 			R = 'x;
+// 			Q = 'x;
+// 		end else begin
+// 			R = X % Y;
+// 			Q = X / Y;
+// 		end
+// 	end
+// endmodule
 
 module FullAdder (
 	input  logic A,

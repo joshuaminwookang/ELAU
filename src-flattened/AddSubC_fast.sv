@@ -85,19 +85,19 @@ endmodule
 
 
 
-module behavioural_AddSubC #(
-	parameter int width = 8,  // word width
-	parameter int speed = 2  // performance parameter
-) (
-	input  logic [width-1:0] A,    // operands
-	input  logic [width-1:0] B,
-	input  logic             CI,   // carry in (added/subtracted)
-	input  logic             SUB,  // subtraction enable
-	output logic [width-1:0] S,    // sum
-	output logic             CO    // carry out
-);
-	assign {CO,S} = SUB ? (A-B-CI) : (A+B+CI);
-endmodule
+// module behavioural_AddSubC #(
+// 	parameter int width = 8,  // word width
+// 	parameter int speed = 2  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,    // operands
+// 	input  logic [width-1:0] B,
+// 	input  logic             CI,   // carry in (added/subtracted)
+// 	input  logic             SUB,  // subtraction enable
+// 	output logic [width-1:0] S,    // sum
+// 	output logic             CO    // carry out
+// );
+// 	assign {CO,S} = SUB ? (A-B-CI) : (A+B+CI);
+// endmodule
 
 
 module PrefixAndOr #(

@@ -65,23 +65,23 @@ endmodule
 
 
 
-module behavioural_LeadSignDet #(
-	parameter int width = 8,     // word width
-	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
-) (
-	input  logic [width-1:0] A,  // operand
-	output logic [width-1:0] Z   // LSD output
-);
-	logic msb;
-	logic [width-1:0] idx;
-	always_comb begin
-		msb = A[width-1];
-		idx = width;
-		for (int i = 0; i < width ; i++ ) begin
-			if(A[i] == ~msb) begin
-				idx = i;
-			end
-		end
-		Z = 1'b1 << idx;
-	end
-endmodule
+// module behavioural_LeadSignDet #(
+// 	parameter int width = 8,     // word width
+// 	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,  // operand
+// 	output logic [width-1:0] Z   // LSD output
+// );
+// 	logic msb;
+// 	logic [width-1:0] idx;
+// 	always_comb begin
+// 		msb = A[width-1];
+// 		idx = width;
+// 		for (int i = 0; i < width ; i++ ) begin
+// 			if(A[i] == ~msb) begin
+// 				idx = i;
+// 			end
+// 		end
+// 		Z = 1'b1 << idx;
+// 	end
+// endmodule

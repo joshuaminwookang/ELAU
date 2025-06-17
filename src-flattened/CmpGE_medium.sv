@@ -72,16 +72,16 @@ endmodule
 
 
 
-module behavioural_CmpGE #(
-	parameter int width = 8,   // word width
-	parameter int speed = 1  // performance parameter
-) (
-	input  logic [width-1:0] A,  // operands
-	input  logic [width-1:0] B,
-	output logic             GE  // greater equal flag
-);
-	assign GE = (A >= B);
-endmodule
+// module behavioural_CmpGE #(
+// 	parameter int width = 8,   // word width
+// 	parameter int speed = 1  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,  // operands
+// 	input  logic [width-1:0] B,
+// 	output logic             GE  // greater equal flag
+// );
+// 	assign GE = (A >= B);
+// endmodule
 
 
 module PrefixAndOr #(

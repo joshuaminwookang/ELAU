@@ -58,15 +58,15 @@ endmodule
 
 
 
-module behavioural_CmpEQGE #(
-	parameter int width = 8,   // word width
-	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
-) (
-	input  logic [width-1:0] A,   // operands
-	input  logic [width-1:0] B,
-	output logic             EQ,  // equal flag
-	output logic             GE   // greater equal flag
-);
-	assign EQ = (A == B);
-	assign GE = (A >= B);
-endmodule
+// module behavioural_CmpEQGE #(
+// 	parameter int width = 8,   // word width
+// 	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,   // operands
+// 	input  logic [width-1:0] B,
+// 	output logic             EQ,  // equal flag
+// 	output logic             GE   // greater equal flag
+// );
+// 	assign EQ = (A == B);
+// 	assign GE = (A >= B);
+// endmodule

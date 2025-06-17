@@ -52,13 +52,13 @@ endmodule
 
 
 
-module behavioural_Bin2Gray #(
-	parameter int width = 8  // word width
-) (
-	input  logic [width-1:0] B,  // binary input
-	output logic [width-1:0] G   // Gray output
-);
+// module behavioural_Bin2Gray #(
+// 	parameter int width = 8  // word width
+// ) (
+// 	input  logic [width-1:0] B,  // binary input
+// 	output logic [width-1:0] G   // Gray output
+// );
 
-	assign G = B ^ (B >> 1);
+// 	assign G = B ^ (B >> 1);
 
-endmodule
+// endmodule

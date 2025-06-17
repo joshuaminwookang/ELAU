@@ -59,56 +59,22 @@ endmodule
 
 
 
-module behavioural_Log2 #(
-    parameter int width = 8,     // word width
-    parameter int speed = 0  // performance parameter
-) (
-    input logic [width-1:0] A,  // operand
-    output logic [$clog2(width)-1:0] Z  // result
-);
-    always_comb begin
-		Z = '0;
-		for (int i = 0; i < width ; i++ ) begin
-			if(A[i] == 1'b1) begin
-				Z = i;
-			end
-		end
-	end
-endmodule
-
-module Encode #(
-	parameter int width = 8  // word width
-) (
-	input logic [width-1:0] A,  // input vector
-	output logic [$clog2(width)-1:0] Z  // enc. output
-);
-
-	localparam int n = width;
-	localparam int m = $clog2(width);
-
-	logic zv;
-
-	// example: n = 8, m = 3
-	//   Z[0] = A[7] || A[5] || A[3] || A[1]
-	//   Z[1] = A[7] || A[6] || A[3] || A[2]
-	//   Z[2] = A[7] || A[6] || A[5] || A[4]
-	// indices correspond to position of black nodes in Sklansky parallel-prefix
-	// algorithm
-	always_comb begin
-		for (int l = 1; l <= m; l++) begin : outbit
-			zv = 1'b0;
-			for (int k = 0; k < 2**(m-l); k++) begin
-				for (int i = 0; i < 2**(l-1); i++) begin
-					if (k * 2**l + 2**(l-1) + i < n) begin
-						zv |= A[k * 2**l + 2**(l-1) +i];
-					end
-				end
-			end
-			Z[l-1] = zv;
-		end
-	end
-
-endmodule
+// module behavioural_Log2 #(
+//     parameter int width = 8,     // word width
+//     parameter int speed = 0  // performance parameter
+// ) (
+//     input logic [width-1:0] A,  // operand
+//     output logic [$clog2(width)-1:0] Z  // result
+// );
+//     always_comb begin
+// 		Z = '0;
+// 		for (int i = 0; i < width ; i++ ) begin
+// 			if(A[i] == 1'b1) begin
+// 				Z = i;
+// 			end
+// 		end
+// 	end
+// endmodule
 
 module PrefixAnd #(
 	parameter int width = 8,  // word width
@@ -241,6 +207,40 @@ module LeadZeroDet #(
 	assign Z[width-1] = A[width-1];
 	for (genvar i = width - 2; i >= 0; i--) begin
 		assign Z[i] = PO[i+1] & A[i];
+	end
+
+endmodule
+
+module Encode #(
+	parameter int width = 8  // word width
+) (
+	input logic [width-1:0] A,  // input vector
+	output logic [$clog2(width)-1:0] Z  // enc. output
+);
+
+	localparam int n = width;
+	localparam int m = $clog2(width);
+
+	logic zv;
+
+	// example: n = 8, m = 3
+	//   Z[0] = A[7] || A[5] || A[3] || A[1]
+	//   Z[1] = A[7] || A[6] || A[3] || A[2]
+	//   Z[2] = A[7] || A[6] || A[5] || A[4]
+	// indices correspond to position of black nodes in Sklansky parallel-prefix
+	// algorithm
+	always_comb begin
+		for (int l = 1; l <= m; l++) begin : outbit
+			zv = 1'b0;
+			for (int k = 0; k < 2**(m-l); k++) begin
+				for (int i = 0; i < 2**(l-1); i++) begin
+					if (k * 2**l + 2**(l-1) + i < n) begin
+						zv |= A[k * 2**l + 2**(l-1) +i];
+					end
+				end
+			end
+			Z[l-1] = zv;
+		end
 	end
 
 endmodule

@@ -52,17 +52,17 @@ endmodule
 
 
 
-module behavioural_Encode #(
-	parameter int width = 8  // word width
-) (
-	input logic [width-1:0] A,  // input vector
-	output logic [$clog2(width)-1:0] Z  // enc. output
-);
-	always_comb begin
-		for (int i = 0; i < width; i++ ) begin
-			if(A[i]) begin
-				Z = i;
-			end
-		end
-	end
-endmodule
+// module behavioural_Encode #(
+// 	parameter int width = 8  // word width
+// ) (
+// 	input logic [width-1:0] A,  // input vector
+// 	output logic [$clog2(width)-1:0] Z  // enc. output
+// );
+// 	always_comb begin
+// 		for (int i = 0; i < width; i++ ) begin
+// 			if(A[i]) begin
+// 				Z = i;
+// 			end
+// 		end
+// 	end
+// endmodule

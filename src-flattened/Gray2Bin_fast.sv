@@ -68,18 +68,18 @@ endmodule
 
 
 
-module behavioural_Gray2Bin #(
-	parameter int width = 8,  // word width
-	parameter int speed = 2  // performance parameter
-) (
-	input  logic [width-1:0] G,  // Gray input
-	output logic [width-1:0] B   // binary output
-);
+// module behavioural_Gray2Bin #(
+// 	parameter int width = 8,  // word width
+// 	parameter int speed = 2  // performance parameter
+// ) (
+// 	input  logic [width-1:0] G,  // Gray input
+// 	output logic [width-1:0] B   // binary output
+// );
 
-    for (genvar i = 0; i < width; i++)
-        assign B[i] = ^G[width-1:i];
+//     for (genvar i = 0; i < width; i++)
+//         assign B[i] = ^G[width-1:i];
 
-endmodule
+// endmodule
 
 
 module PrefixXor #(

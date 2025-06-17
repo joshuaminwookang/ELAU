@@ -37,11 +37,11 @@ endmodule
 
 
 
-module behavioural_AllZeroDet #(
-	parameter int width = 8  // word width
-) (
-	input  logic [width-1:0] A,  // operand
-	output logic             Z   // all-zeroes flag
-);
-	assign Z = (A == '0);
-endmodule
+// module behavioural_AllZeroDet #(
+// 	parameter int width = 8  // word width
+// ) (
+// 	input  logic [width-1:0] A,  // operand
+// 	output logic             Z   // all-zeroes flag
+// );
+// 	assign Z = (A == '0);
+// endmodule
