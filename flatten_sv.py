@@ -5,9 +5,23 @@ SRC = Path('src')
 DST = Path('src-flattened')
 DST.mkdir(exist_ok=True)
 
-# Load package content
-arith_pkg_path = SRC / 'arith_utils.sv'
-arith_pkg_content = arith_pkg_path.read_text() if arith_pkg_path.exists() else ''
+# Manual replacement for lau_pkg contents to avoid package use
+LOG2FLOOR_FUNC = """
+function automatic integer log2floor;
+    input integer n;
+    integer m;
+    integer p;
+    begin
+        m = -1;
+        p = 1;
+        while (p <= n) begin
+            m = m + 1;
+            p = p * 2;
+        end
+        log2floor = m;
+    end
+endfunction
+"""
 
 # Gather module/package definitions
 module_defs = {}
@@ -67,9 +81,22 @@ for path in SRC.glob('*.sv'):
     dep_contents = []
     for mname in mods:
         dep_contents.extend(gather(mname, seen))
-    out = []
-    if arith_pkg_content:
-        out.append(arith_pkg_content)
-    out.append(text)
+    out = [text]
     out.extend(dep_contents)
-    (DST / path.name).write_text('\n\n'.join(out))
+    base_text = '\n\n'.join(out)
+
+    def apply_common(txt: str) -> str:
+        txt = re.sub(r'(?s)package\s+lau_pkg\s*;.*?endpackage', '', txt)
+        txt = txt.replace('lau_pkg::log2floor', 'log2floor')
+        txt = txt.replace('lau_pkg::FAST', '2')
+        txt = txt.replace('lau_pkg::MEDIUM', '1')
+        txt = txt.replace('lau_pkg::SLOW', '0')
+        txt = txt.replace('lau_pkg::speed_e', 'int')
+        return txt
+
+    for val, suff in [(2, 'fast'), (1, 'medium'), (0, 'slow')]:
+        txt = apply_common(base_text)
+        txt = re.sub(r'(parameter\s+int\s+speed\s*=)\s*\d+', f"\\1 {val}", txt)
+        (DST / f"{path.stem}_{suff}{path.suffix}").write_text(
+            LOG2FLOOR_FUNC + '\n\n' + txt
+        )
