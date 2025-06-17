@@ -110,13 +110,13 @@ endmodule
 
 
 
-module behavioural_SqrtArrUns #(
-	parameter int widthX = 8
-) (
-	input  logic [widthX-1:0] X,  // operand
-	output logic [(widthX+1)/2-1:0] Q,  // square root
-	output logic [(widthX+1)/2-1:0] R  // remainder
-);
-	assign Q = $floor($sqrt(X));
-	assign R = X - Q**2;
-endmodule
+// module behavioural_SqrtArrUns #(
+// 	parameter int widthX = 8
+// ) (
+// 	input  logic [widthX-1:0] X,  // operand
+// 	output logic [(widthX+1)/2-1:0] Q,  // square root
+// 	output logic [(widthX+1)/2-1:0] R  // remainder
+// );
+// 	assign Q = $floor($sqrt(X));
+// 	assign R = X - Q**2;
+// endmodule

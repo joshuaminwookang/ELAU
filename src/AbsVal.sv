@@ -43,15 +43,3 @@ module AbsVal #(
 	assign Z = AI[width:1] ^ PO[width-1:0];
 
 endmodule
-
-
-
-module behavioural_AbsVal #(
-	parameter int width = 8,   // word width
-	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
-) (
-	input  logic [width-1:0] A,  // operand
-	output logic [width-1:0] Z   // result
-);
-	assign Z = (signed'(A) < 0) ? -A : A;
-endmodule

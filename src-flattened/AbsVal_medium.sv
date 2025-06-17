@@ -62,18 +62,6 @@ module AbsVal #(
 endmodule
 
 
-
-module behavioural_AbsVal #(
-	parameter int width = 8,   // word width
-	parameter int speed = 1  // performance parameter
-) (
-	input  logic [width-1:0] A,  // operand
-	output logic [width-1:0] Z   // result
-);
-	assign Z = (signed'(A) < 0) ? -A : A;
-endmodule
-
-
 module PrefixAnd #(
 	parameter int width = 8,  // word width
 	parameter int speed = 1  // performance parameter

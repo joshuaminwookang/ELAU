@@ -94,29 +94,29 @@ endmodule
 
 
 
-module behavioural_SubVZ #(
-	parameter width = 8,  // word width
-	parameter int speed = 1  // performance parameter
-) (
-	input logic [width-1:0] A,  // operands
-	input logic [width-1:0] B,
-	input logic CI,  // carry in (subtracted)
-	output logic [width-1:0] S,  // sum
-	output logic V, // overflow flag
-	output logic Z  // zero flag (only valid for CI = 0)
-);
-	localparam MAX = 2**(width-1) -1;
-	localparam MIN = - 2**(width-1);
-	logic signed [width+1:0] Sext, Aext, Bext, CIext;
-	assign Aext = signed'(A);
-	assign Bext = signed'(B);
-	assign CIext = {{width-1{1'b0}},CI};
+// module behavioural_SubVZ #(
+// 	parameter width = 8,  // word width
+// 	parameter int speed = 1  // performance parameter
+// ) (
+// 	input logic [width-1:0] A,  // operands
+// 	input logic [width-1:0] B,
+// 	input logic CI,  // carry in (subtracted)
+// 	output logic [width-1:0] S,  // sum
+// 	output logic V, // overflow flag
+// 	output logic Z  // zero flag (only valid for CI = 0)
+// );
+// 	localparam MAX = 2**(width-1) -1;
+// 	localparam MIN = - 2**(width-1);
+// 	logic signed [width+1:0] Sext, Aext, Bext, CIext;
+// 	assign Aext = signed'(A);
+// 	assign Bext = signed'(B);
+// 	assign CIext = {{width-1{1'b0}},CI};
 
-	assign Sext = (Aext - Bext -CIext);
-	assign S = Sext[width-1:0];
-	assign V = (Sext>MAX) | (Sext<MIN);
-	assign Z = CI ? 'x : (Sext == '0);
-endmodule
+// 	assign Sext = (Aext - Bext -CIext);
+// 	assign S = Sext[width-1:0];
+// 	assign V = (Sext>MAX) | (Sext<MIN);
+// 	assign Z = CI ? 'x : (Sext == '0);
+// endmodule
 
 
 module PrefixAndOr #(

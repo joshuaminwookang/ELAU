@@ -63,16 +63,16 @@ endmodule
 
 
 
-module behavioural_SumZeroDet #(
-	parameter int width = 8  // word width
-) (
-	input  logic [width-1:0] A,
-	input  logic [width-1:0] B,  // operands
-	input  logic             CI,  // carry in
-	output logic             Z    // all-zeroes sum flag
-);
-	assign Z = ((A+B+CI) == '0);
-endmodule
+// module behavioural_SumZeroDet #(
+// 	parameter int width = 8  // word width
+// ) (
+// 	input  logic [width-1:0] A,
+// 	input  logic [width-1:0] B,  // operands
+// 	input  logic             CI,  // carry in
+// 	output logic             Z    // all-zeroes sum flag
+// );
+// 	assign Z = ((A+B+CI) == '0);
+// endmodule
 
 module RedAnd #(
 	parameter int width = 8  // word width

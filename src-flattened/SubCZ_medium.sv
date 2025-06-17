@@ -93,21 +93,21 @@ endmodule
 
 
 
-module behavioural_SubCZ #(
-	parameter width = 8,  // word width
-	parameter int speed = 1  // performance parameter
-) (
-	input logic [width-1:0] A,  // operands
-	input logic [width-1:0] B,
-	input logic CI,  // carry in (subtracted)
-	output logic [width-1:0] S,  // sum
-	output logic CO,  // carry out ('1' if S negative)
-	output logic Z // zero flag (only valid for CI = 0)
-);
-	assign {CO,S} = A - B - CI;
-	// Z is not valid when CI != 0, so set it to X
-	assign Z = CI ? 'x : (S == '0);
-endmodule
+// module behavioural_SubCZ #(
+// 	parameter width = 8,  // word width
+// 	parameter int speed = 1  // performance parameter
+// ) (
+// 	input logic [width-1:0] A,  // operands
+// 	input logic [width-1:0] B,
+// 	input logic CI,  // carry in (subtracted)
+// 	output logic [width-1:0] S,  // sum
+// 	output logic CO,  // carry out ('1' if S negative)
+// 	output logic Z // zero flag (only valid for CI = 0)
+// );
+// 	assign {CO,S} = A - B - CI;
+// 	// Z is not valid when CI != 0, so set it to X
+// 	assign Z = CI ? 'x : (S == '0);
+// endmodule
 
 
 module PrefixAndOr #(

@@ -276,34 +276,6 @@ module Add #(
 	end
 endmodule
 
-module AddCsv #(
-	parameter int width = 8  // word width
-) (
-	input  logic [width-1:0] A1,  // operands
-	input  logic [width-1:0] A2,
-	input  logic [width-1:0] A3,
-	output logic [width-1:0] S,   // sum / carry vector
-	output logic [width-1:0] C
-);
-
-	logic [width-1:0] CT;  // unshifted output carries
-
-	// carry-save addition using full-adders
-	for (genvar i = 0; i < width; i++) begin : bits
-		FullAdder fa (
-		.A  (A1[i]),
-		.B  (A2[i]),
-		.CI (A3[i]),
-		.S  (S[i] ),
-		.CO (CT[i])
-		);
-	end
-
-	// rotate output carries by one position
-	assign C = {CT[width-2:0], 1'b0};
-
-endmodule
-
 module Cpr #(
 	parameter int              depth = 4,             // number of input bits
 	parameter int speed = 1  // performance parameter
@@ -446,5 +418,33 @@ module MulPPGenUns #(
 
 		PP = ppt;
 	end
+
+endmodule
+
+module AddCsv #(
+	parameter int width = 8  // word width
+) (
+	input  logic [width-1:0] A1,  // operands
+	input  logic [width-1:0] A2,
+	input  logic [width-1:0] A3,
+	output logic [width-1:0] S,   // sum / carry vector
+	output logic [width-1:0] C
+);
+
+	logic [width-1:0] CT;  // unshifted output carries
+
+	// carry-save addition using full-adders
+	for (genvar i = 0; i < width; i++) begin : bits
+		FullAdder fa (
+		.A  (A1[i]),
+		.B  (A2[i]),
+		.CI (A3[i]),
+		.S  (S[i] ),
+		.CO (CT[i])
+		);
+	end
+
+	// rotate output carries by one position
+	assign C = {CT[width-2:0], 1'b0};
 
 endmodule

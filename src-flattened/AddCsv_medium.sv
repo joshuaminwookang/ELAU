@@ -60,15 +60,15 @@ module AddCsv #(
 endmodule
 
 
-module behavioural_AddCsv #(
-	parameter int width = 8  // word width
-) (
-	input  logic [width-1:0] A1,  // operands
-	input  logic [width-1:0] A2,
-	input  logic [width-1:0] A3,
-	output logic [width-1:0] S,   // sum / carry vector
-	output logic [width-1:0] C
-);
-	assign S = A1 ^ A2 ^ A3; // carry-less sum
-	assign C = ((A1 & A2) | (A1 & A3) | (A2 & A3)) << 1;
-endmodule
+// module behavioural_AddCsv #(
+// 	parameter int width = 8  // word width
+// ) (
+// 	input  logic [width-1:0] A1,  // operands
+// 	input  logic [width-1:0] A2,
+// 	input  logic [width-1:0] A3,
+// 	output logic [width-1:0] S,   // sum / carry vector
+// 	output logic [width-1:0] C
+// );
+// 	assign S = A1 ^ A2 ^ A3; // carry-less sum
+// 	assign C = ((A1 & A2) | (A1 & A3) | (A2 & A3)) << 1;
+// endmodule

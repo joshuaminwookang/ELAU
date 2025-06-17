@@ -56,17 +56,17 @@ endmodule
 
 
 
-module behavioural_AddMod2Nm1 #(
-	parameter int              width = 8,             // word width
-	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
-) (
-	input  logic [width-1:0] A,  // operands
-	input  logic [width-1:0] B,
-	output logic [width-1:0] S   // sum
-);
-	localparam int unsigned mod = 2**width -1;
-	logic [width:0] total;
-	assign total = {1'b0, A} + {1'b0, B};
-	// double-zero so total==mod is non-wrapping
-	assign S = (total <= mod) ? total : (total - mod);
-endmodule
+// module behavioural_AddMod2Nm1 #(
+// 	parameter int              width = 8,             // word width
+// 	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,  // operands
+// 	input  logic [width-1:0] B,
+// 	output logic [width-1:0] S   // sum
+// );
+// 	localparam int unsigned mod = 2**width -1;
+// 	logic [width:0] total;
+// 	assign total = {1'b0, A} + {1'b0, B};
+// 	// double-zero so total==mod is non-wrapping
+// 	assign S = (total <= mod) ? total : (total - mod);
+// endmodule

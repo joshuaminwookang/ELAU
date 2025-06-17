@@ -72,6 +72,42 @@ module MulCsvUns #(
 endmodule
 
 
+module AddMulPPGenUns #(
+	parameter int widthX = 8,  // word width of XS, XC
+	parameter int widthY = 8,  // word width of Y
+	localparam int widthP = widthX+widthY
+) (
+	input logic [widthX-1:0] XS,  // multipliers
+	input logic [widthX-1:0] XC,
+	input logic [widthY-1:0] Y,  // multiplicand
+	output logic [widthX*(widthP)-1:0] PP  // partial products
+);
+
+	logic [widthX-1:0] M1, M2;  // recoded multiplier
+	logic [widthY+1:0] YT;  // expanded Y
+
+	// recode multiplier
+	assign M1 = XS ^ XC;
+	assign M2 = XS & XC;
+
+	// expand Y (used for term 2y)
+	assign YT = {1'b0, Y, 1'b0};
+
+	logic [widthX*widthP-1:0] ppt;
+
+	// partial product generation
+	always_comb begin
+		ppt = 0;
+		for (int i = 0; i < widthX; i++) begin
+			for (int k = 0; k <= widthY; k++) begin
+				ppt[i*widthP+i+k] = (M1[i] & YT[k+1]) | (M2[i] & YT[k]);
+			end
+		end
+		PP = ppt;
+	end
+
+endmodule
+
 module Cpr #(
 	parameter int              depth = 4,             // number of input bits
 	parameter int speed = 2  // performance parameter
@@ -184,41 +220,5 @@ module AddMopCsv #(
 
 	// shift left output carries by one position
 	assign C = {CT[width-2:0], 1'b0};
-
-endmodule
-
-module AddMulPPGenUns #(
-	parameter int widthX = 8,  // word width of XS, XC
-	parameter int widthY = 8,  // word width of Y
-	localparam int widthP = widthX+widthY
-) (
-	input logic [widthX-1:0] XS,  // multipliers
-	input logic [widthX-1:0] XC,
-	input logic [widthY-1:0] Y,  // multiplicand
-	output logic [widthX*(widthP)-1:0] PP  // partial products
-);
-
-	logic [widthX-1:0] M1, M2;  // recoded multiplier
-	logic [widthY+1:0] YT;  // expanded Y
-
-	// recode multiplier
-	assign M1 = XS ^ XC;
-	assign M2 = XS & XC;
-
-	// expand Y (used for term 2y)
-	assign YT = {1'b0, Y, 1'b0};
-
-	logic [widthX*widthP-1:0] ppt;
-
-	// partial product generation
-	always_comb begin
-		ppt = 0;
-		for (int i = 0; i < widthX; i++) begin
-			for (int k = 0; k <= widthY; k++) begin
-				ppt[i*widthP+i+k] = (M1[i] & YT[k+1]) | (M2[i] & YT[k]);
-			end
-		end
-		PP = ppt;
-	end
 
 endmodule

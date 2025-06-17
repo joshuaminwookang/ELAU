@@ -68,16 +68,3 @@ module Add #(
 		assign S = PT ^ {GO[width-2:0], 1'b0};
 	end
 endmodule
-
-
-
-module behavioural_Add #(
-	parameter int              width = 8,             // word width
-	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
-) (
-	input  logic [width-1:0] A,  // operands
-	input  logic [width-1:0] B,
-	output logic [width-1:0] S   // sum
-);
-	assign S = A + B;
-endmodule

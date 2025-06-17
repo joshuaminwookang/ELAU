@@ -80,17 +80,17 @@ endmodule
 
 
 
-module behavioural_MulSgn #(
-	parameter int widthX = 8,  // word width of X (X <= Y)
-	parameter int widthY = 8,  // word width of Y
-	parameter int speed = 2  // performance parameter
-) (
-	input logic [widthX-1:0] X,  // multiplier
-	input logic [widthY-1:0] Y,  // multiplicand
-	output logic [widthX+widthY-1:0] P  // product
-);
-	assign P = signed'(X) * signed'(Y);
-endmodule
+// module behavioural_MulSgn #(
+// 	parameter int widthX = 8,  // word width of X (X <= Y)
+// 	parameter int widthY = 8,  // word width of Y
+// 	parameter int speed = 2  // performance parameter
+// ) (
+// 	input logic [widthX-1:0] X,  // multiplier
+// 	input logic [widthY-1:0] Y,  // multiplicand
+// 	output logic [widthX+widthY-1:0] P  // product
+// );
+// 	assign P = signed'(X) * signed'(Y);
+// endmodule
 
 module PrefixAndOr #(
 	parameter int              width = 8,             // word width
@@ -266,6 +266,49 @@ module Add #(
 	end
 endmodule
 
+module MulPPGenSgn #(
+	parameter int widthX = 8,  // word width of X
+	parameter int widthY = 8   // word width of Y
+) (
+	input logic [widthX-1:0] X,  // multiplier
+	input logic [widthY-1:0] Y,  // multiplicand
+	output logic [(widthX+2)*(widthX+widthY)-1:0] PP  // partial products
+);
+
+	localparam int unsigned widthP = widthX + widthY;  // width of single part. prod.
+
+	always_comb begin
+		logic [(widthX+2)*widthP-1:0] ppt;  // partial product vector
+
+		// Initialize ppt to all zeros
+		ppt = '0;
+
+		// Generate partial products x(i)y(k)
+		for (int i = 0; i < widthX-1; i++) begin
+			for (int k = 0; k < widthY-1; k++) begin
+				ppt[i*widthP+i+k] = X[i] & Y[k];
+			end
+			ppt[i*widthP+i+widthY-1] = ~X[i] & Y[widthY-1];
+		end
+
+		for (int k = 0; k < widthY-1; k++) begin
+			ppt[(widthX-1)*widthP+(widthX-1)+k] = X[widthX-1] & ~Y[k];
+		end
+		ppt[(widthX-1)*widthP+(widthX-1)+widthY-1] = X[widthX-1] & Y[widthY-1];
+
+		// Generate correction terms
+		ppt[(widthX+1)*widthP-2] = ~X[widthX-1];
+		ppt[widthX*widthP+widthX-1] = X[widthX-1];
+		ppt[(widthX+2)*widthP-1] = 1'b1;
+		ppt[(widthX+2)*widthP-2] = ~Y[widthY-1];
+		ppt[(widthX+1)*widthP+widthY-1] = Y[widthY-1];
+
+		// Assign output
+		PP = ppt;
+	end
+
+endmodule
+
 module Cpr #(
 	parameter int              depth = 4,             // number of input bits
 	parameter int speed = 2  // performance parameter
@@ -378,48 +421,5 @@ module AddMopCsv #(
 
 	// shift left output carries by one position
 	assign C = {CT[width-2:0], 1'b0};
-
-endmodule
-
-module MulPPGenSgn #(
-	parameter int widthX = 8,  // word width of X
-	parameter int widthY = 8   // word width of Y
-) (
-	input logic [widthX-1:0] X,  // multiplier
-	input logic [widthY-1:0] Y,  // multiplicand
-	output logic [(widthX+2)*(widthX+widthY)-1:0] PP  // partial products
-);
-
-	localparam int unsigned widthP = widthX + widthY;  // width of single part. prod.
-
-	always_comb begin
-		logic [(widthX+2)*widthP-1:0] ppt;  // partial product vector
-
-		// Initialize ppt to all zeros
-		ppt = '0;
-
-		// Generate partial products x(i)y(k)
-		for (int i = 0; i < widthX-1; i++) begin
-			for (int k = 0; k < widthY-1; k++) begin
-				ppt[i*widthP+i+k] = X[i] & Y[k];
-			end
-			ppt[i*widthP+i+widthY-1] = ~X[i] & Y[widthY-1];
-		end
-
-		for (int k = 0; k < widthY-1; k++) begin
-			ppt[(widthX-1)*widthP+(widthX-1)+k] = X[widthX-1] & ~Y[k];
-		end
-		ppt[(widthX-1)*widthP+(widthX-1)+widthY-1] = X[widthX-1] & Y[widthY-1];
-
-		// Generate correction terms
-		ppt[(widthX+1)*widthP-2] = ~X[widthX-1];
-		ppt[widthX*widthP+widthX-1] = X[widthX-1];
-		ppt[(widthX+2)*widthP-1] = 1'b1;
-		ppt[(widthX+2)*widthP-2] = ~Y[widthY-1];
-		ppt[(widthX+1)*widthP+widthY-1] = Y[widthY-1];
-
-		// Assign output
-		PP = ppt;
-	end
 
 endmodule

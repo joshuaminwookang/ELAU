@@ -38,13 +38,13 @@ endmodule
 
 
 
-module behavioural_RedAnd #(
-	parameter int width = 8  // word width
-) (
-	input  logic [width-1:0] A,  // input vector
-	output logic             Z   // output bit
-);
+// module behavioural_RedAnd #(
+// 	parameter int width = 8  // word width
+// ) (
+// 	input  logic [width-1:0] A,  // input vector
+// 	output logic             Z   // output bit
+// );
 
-	assign Z = &A;
+// 	assign Z = &A;
 
-endmodule
+// endmodule

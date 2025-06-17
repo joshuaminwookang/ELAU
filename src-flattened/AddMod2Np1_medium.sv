@@ -73,22 +73,22 @@ endmodule
 
 
 
-module behavioural_AddMod2Np1 #(
-	parameter int              width = 8,             // word width
-	parameter int speed = 1  // performance parameter
-) (
-	input  logic [width-1:0] A,  // operands
-	input  logic [width-1:0] B,
-	output logic [width-1:0] S   // sum
-);
-	localparam int unsigned mod = 2**width +1;
-	logic [width+1:0] Auns, Buns, Suns; // normal unsigned representation
-	assign Auns = {2'b00, A} + 1; // recover diminished-one
-	assign Buns = {2'b00, B} + 1; // recover diminished-one
-	assign Suns = (Auns + Buns) % mod;
-	// zero is unique, otherwise diminished one
-	assign S = (S == 0) ? '0 : (S[width-1:0] - 1);
-endmodule
+// module behavioural_AddMod2Np1 #(
+// 	parameter int              width = 8,             // word width
+// 	parameter int speed = 1  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,  // operands
+// 	input  logic [width-1:0] B,
+// 	output logic [width-1:0] S   // sum
+// );
+// 	localparam int unsigned mod = 2**width +1;
+// 	logic [width+1:0] Auns, Buns, Suns; // normal unsigned representation
+// 	assign Auns = {2'b00, A} + 1; // recover diminished-one
+// 	assign Buns = {2'b00, B} + 1; // recover diminished-one
+// 	assign Suns = (Auns + Buns) % mod;
+// 	// zero is unique, otherwise diminished one
+// 	assign S = (S == 0) ? '0 : (S[width-1:0] - 1);
+// endmodule
 
 module PrefixAndOr #(
 	parameter int              width = 8,             // word width

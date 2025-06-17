@@ -68,14 +68,71 @@ endmodule
 
 
 
-module behavioural_SqrSgn #(
-	parameter width = 8,
-	parameter int speed = 0  // performance parameter
+// module behavioural_SqrSgn #(
+// 	parameter width = 8,
+// 	parameter int speed = 0  // performance parameter
+// ) (
+// 	input  logic [  width-1:0] X,  // operand
+// 	output logic [2*width-1:0] P   // product
+// );
+// 	assign P = signed'(X) * signed'(X);
+// endmodule
+
+module SqrPPGenSgn #(
+	parameter width = 8
 ) (
-	input  logic [  width-1:0] X,  // operand
-	output logic [2*width-1:0] P   // product
+	input logic [width-1:0] X,  // operand
+	output logic [(width/2+1)*2*width-1:0] PP  // partial products
 );
-	assign P = signed'(X) * signed'(X);
+
+	localparam widthP = 2*width;
+	logic [(width/2+1)*widthP-1:0] ppt;  // internal signal
+
+	always_comb begin
+		// Defaults
+		ppt = '0;
+
+		// Lower products x(i)x(k), i != k
+		for (int i = 0; i < (width-1) /2; i++) begin
+			for (int k = i + 1; k < width-i-1; k++) begin
+				ppt[i*widthP +i+k+1] = X[i] & X[k];
+			end
+		end
+
+		// Upper products x(i)x(k), i != k
+		for (int k = 0; k < width-1; k++) begin
+			ppt[width+k] = ~X[k] & X[width-1];
+		end
+		for (int i = 1; i < width/2; i++) begin
+			for (int k = i; k < width -i-1; k++) begin
+				ppt[i*widthP+width-i+k] = X[k] & X[width-i-1];
+			end
+		end
+
+		// Lower products x(i)x(i)
+		for (int i = 0; i <= (width-1) /2; i++) begin
+			ppt[i*widthP+2*i] = X[i];
+		end
+
+		// Upper products x(i)x(i)
+		for (int i = 1; i <= width/2; i++) begin
+			ppt[i*widthP+2*width-2*i] = X[width-i];
+		end
+
+		// Correction terms
+		ppt[widthP-1]   = ~X[width-1];
+		ppt[2*widthP-1] = 1'b1;
+		if (width % 2 == 0) begin
+			ppt[(width/2-1)*widthP+width-1] = X[width-1];
+			ppt[(width/2)*widthP+width-1]   = X[width-1];
+		end else begin
+			ppt[(width/2)*widthP+width] = X[width-1];
+		end
+
+		// Assign to output
+		PP = ppt;
+	end
+
 endmodule
 
 module PrefixAndOr #(
@@ -364,62 +421,5 @@ module AddMopCsv #(
 
 	// shift left output carries by one position
 	assign C = {CT[width-2:0], 1'b0};
-
-endmodule
-
-module SqrPPGenSgn #(
-	parameter width = 8
-) (
-	input logic [width-1:0] X,  // operand
-	output logic [(width/2+1)*2*width-1:0] PP  // partial products
-);
-
-	localparam widthP = 2*width;
-	logic [(width/2+1)*widthP-1:0] ppt;  // internal signal
-
-	always_comb begin
-		// Defaults
-		ppt = '0;
-
-		// Lower products x(i)x(k), i != k
-		for (int i = 0; i < (width-1) /2; i++) begin
-			for (int k = i + 1; k < width-i-1; k++) begin
-				ppt[i*widthP +i+k+1] = X[i] & X[k];
-			end
-		end
-
-		// Upper products x(i)x(k), i != k
-		for (int k = 0; k < width-1; k++) begin
-			ppt[width+k] = ~X[k] & X[width-1];
-		end
-		for (int i = 1; i < width/2; i++) begin
-			for (int k = i; k < width -i-1; k++) begin
-				ppt[i*widthP+width-i+k] = X[k] & X[width-i-1];
-			end
-		end
-
-		// Lower products x(i)x(i)
-		for (int i = 0; i <= (width-1) /2; i++) begin
-			ppt[i*widthP+2*i] = X[i];
-		end
-
-		// Upper products x(i)x(i)
-		for (int i = 1; i <= width/2; i++) begin
-			ppt[i*widthP+2*width-2*i] = X[width-i];
-		end
-
-		// Correction terms
-		ppt[widthP-1]   = ~X[width-1];
-		ppt[2*widthP-1] = 1'b1;
-		if (width % 2 == 0) begin
-			ppt[(width/2-1)*widthP+width-1] = X[width-1];
-			ppt[(width/2)*widthP+width-1]   = X[width-1];
-		end else begin
-			ppt[(width/2)*widthP+width] = X[width-1];
-		end
-
-		// Assign to output
-		PP = ppt;
-	end
 
 endmodule

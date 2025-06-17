@@ -47,13 +47,13 @@ endmodule
 
 
 
-module behavioural_NegC #(
-	parameter int width = 8,  // word width
-	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
-) (
-	input  logic [width-1:0] A,    // operand
-	input  logic             Neg,  // negation enable
-	output logic [width-1:0] Z     // result
-);
-	assign Z = Neg? -A : A;
-endmodule
+// module behavioural_NegC #(
+// 	parameter int width = 8,  // word width
+// 	parameter lau_pkg::speed_e speed = lau_pkg::FAST  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,    // operand
+// 	input  logic             Neg,  // negation enable
+// 	output logic [width-1:0] Z     // result
+// );
+// 	assign Z = Neg? -A : A;
+// endmodule

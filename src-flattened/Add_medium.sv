@@ -87,18 +87,6 @@ module Add #(
 endmodule
 
 
-
-module behavioural_Add #(
-	parameter int              width = 8,             // word width
-	parameter int speed = 1  // performance parameter
-) (
-	input  logic [width-1:0] A,  // operands
-	input  logic [width-1:0] B,
-	output logic [width-1:0] S   // sum
-);
-	assign S = A + B;
-endmodule
-
 module PrefixAndOr #(
 	parameter int              width = 8,             // word width
 	parameter int speed = 1  // performance parameter

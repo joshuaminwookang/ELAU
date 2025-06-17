@@ -72,18 +72,18 @@ endmodule
 
 
 
-module behavioural_AddCfast #(
-	parameter int              width = 8,             // word width
-	parameter int speed = 2  // performance parameter
-) (
-	input  logic [width-1:0] A,   // operands
-	input  logic [width-1:0] B,
-	input  logic             CI,  // carry in
-	output logic [width-1:0] S,   // sum
-	output logic             CO   // carry out
-);
-	assign {CO,S} = A + B + CI;
-endmodule
+// module behavioural_AddCfast #(
+// 	parameter int              width = 8,             // word width
+// 	parameter int speed = 2  // performance parameter
+// ) (
+// 	input  logic [width-1:0] A,   // operands
+// 	input  logic [width-1:0] B,
+// 	input  logic             CI,  // carry in
+// 	output logic [width-1:0] S,   // sum
+// 	output logic             CO   // carry out
+// );
+// 	assign {CO,S} = A + B + CI;
+// endmodule
 
 module PrefixAndOr #(
 	parameter int              width = 8,             // word width

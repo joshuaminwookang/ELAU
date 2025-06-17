@@ -69,21 +69,21 @@ endmodule
 
 
 
-module behavioural_AddMop #(
-	parameter int              width = 8,             // word width
-	parameter int              depth = 4,             // number of operands
-	parameter int speed = 0  // performance parameter
-) (
-	input  logic [(depth*width)-1:0] A,  // operands
-	output logic [        width-1:0] S   // sum
-);
-	always_comb begin : reduction
-		S = '0;
-		for (int i = 0; i < depth; i++) begin
-			S += A[width*i +: width];
-		end
-	end
-endmodule
+// module behavioural_AddMop #(
+// 	parameter int              width = 8,             // word width
+// 	parameter int              depth = 4,             // number of operands
+// 	parameter int speed = 0  // performance parameter
+// ) (
+// 	input  logic [(depth*width)-1:0] A,  // operands
+// 	output logic [        width-1:0] S   // sum
+// );
+// 	always_comb begin : reduction
+// 		S = '0;
+// 		for (int i = 0; i < depth; i++) begin
+// 			S += A[width*i +: width];
+// 		end
+// 	end
+// endmodule
 
 
 module PrefixAndOr #(

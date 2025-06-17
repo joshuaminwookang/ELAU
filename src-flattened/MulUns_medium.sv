@@ -81,16 +81,46 @@ endmodule
 
 
 
-module behavioural_MulUns #(
-	parameter int widthX = 16,  // word width of X (X <= Y)
-	parameter int widthY = 16,  // word width of Y
-	parameter int speed = 1  // performance parameter
-) (
+// module behavioural_MulUns #(
+// 	parameter int widthX = 16,  // word width of X (X <= Y)
+// 	parameter int widthY = 16,  // word width of Y
+// 	parameter int speed = 1  // performance parameter
+// ) (
+// 	input logic [widthX-1:0] X,  // multiplier
+// 	input logic [widthY-1:0] Y,  // multiplicand
+// 	output logic [widthX+widthY-1:0] P  // product
+// );
+// 	assign P = unsigned'(X) * unsigned'(Y);
+// endmodule
+
+module MulPPGenUns #(
+	parameter widthX = 8,  // word width of X
+	parameter widthY = 8
+)  // word width of Y
+(
 	input logic [widthX-1:0] X,  // multiplier
 	input logic [widthY-1:0] Y,  // multiplicand
-	output logic [widthX+widthY-1:0] P  // product
+	output logic [widthX*(widthX+widthY)-1:0] PP
 );
-	assign P = unsigned'(X) * unsigned'(Y);
+
+	// width of single part. prod.
+	localparam widthP = widthX + widthY;
+
+	logic [widthX*widthP-1:0] ppt;  // partial products
+
+	always_comb begin : ppGen
+		ppt = '0;  // partial products
+
+		// partial products x(i)y(k)
+		for (int i = 0; i < widthX; i++) begin
+			for (int k = 0; k < widthY; k++) begin
+				ppt[i*widthP+i+k] = X[i] & Y[k];
+			end
+		end
+
+		PP = ppt;
+	end
+
 endmodule
 
 module PrefixAndOr #(
@@ -379,35 +409,5 @@ module AddMopCsv #(
 
 	// shift left output carries by one position
 	assign C = {CT[width-2:0], 1'b0};
-
-endmodule
-
-module MulPPGenUns #(
-	parameter widthX = 8,  // word width of X
-	parameter widthY = 8
-)  // word width of Y
-(
-	input logic [widthX-1:0] X,  // multiplier
-	input logic [widthY-1:0] Y,  // multiplicand
-	output logic [widthX*(widthX+widthY)-1:0] PP
-);
-
-	// width of single part. prod.
-	localparam widthP = widthX + widthY;
-
-	logic [widthX*widthP-1:0] ppt;  // partial products
-
-	always_comb begin : ppGen
-		ppt = '0;  // partial products
-
-		// partial products x(i)y(k)
-		for (int i = 0; i < widthX; i++) begin
-			for (int k = 0; k < widthY; k++) begin
-				ppt[i*widthP+i+k] = X[i] & Y[k];
-			end
-		end
-
-		PP = ppt;
-	end
 
 endmodule
